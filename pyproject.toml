@@ -1,0 +1,9 @@
+[project]
+name = "pydantic-env-demo"
+version = "0.1.0"
+description = "Demo: PydanticAI agent with Monty sandbox and Ollama"
+requires-python = ">=3.11"
+dependencies = [
+    "pydantic-ai>=1.56.0",
+    "pydantic-monty>=0.0.3",
+]
