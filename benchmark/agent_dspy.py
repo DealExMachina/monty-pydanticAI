@@ -97,13 +97,17 @@ def run_dspy_agent(
         wall_time = time.perf_counter() - t0
 
         raw_answer = result.answer if hasattr(result, "answer") else str(result)
-        extracted = extract_number(raw_answer)
 
-        # Fallback to sandbox raw value
-        if extracted is None and session.last_successful_value is not None:
+        # Primary: use sandbox raw value (the actual computed result)
+        extracted = None
+        if session.last_successful_value is not None:
             val = session.last_successful_value
             if isinstance(val, (int, float)):
                 extracted = float(val)
+
+        # Fallback: parse from agent text if sandbox didn't return a number
+        if extracted is None:
+            extracted = extract_number(raw_answer)
 
         return AgentResult(
             agent_name=agent_name,
