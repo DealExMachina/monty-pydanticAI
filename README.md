@@ -54,24 +54,64 @@ You > Calcule la somme des carrés des 10 premiers entiers
 Agent > La somme des carrés des 10 premiers entiers est **385**.
 ```
 
-## Monty sandbox limitations
+## Benchmark: PydanticAI vs DSPy ReAct
+
+The `benchmark/` directory compares three agent approaches on **100 quantitative finance calculations** (Black-Scholes, Greeks, VaR, bond pricing, NPV, Sharpe ratio, etc.):
+
+| Agent | Description |
+|---|---|
+| **PydanticAI + Monty** | Hand-crafted system prompt |
+| **DSPy ReAct + Monty** | DSPy vanilla (auto-generated prompt) |
+| **DSPy ReAct optimized** | After BootstrapFewShot optimization |
+
+All three use the same model (`qwen3:8b` via Ollama) and the same Monty sandbox with math external functions (`sqrt`, `ln`, `exp`, `norm_cdf`, `norm_pdf`).
+
+### Run the benchmark
+
+```bash
+# Verify the dataset (100 examples, 10 categories)
+uv run python -c "from benchmark.dataset import verify_dataset; verify_dataset()"
+
+# Quick test (3 questions, PydanticAI only)
+uv run python -m benchmark.run --limit 3 --no-dspy --no-optimized
+
+# Full benchmark (all 3 agents, 100 questions each)
+uv run python -m benchmark.run
+
+# DSPy optimization (optional, ~30-60 min)
+uv run python -m benchmark.agent_dspy_optimized
+uv run python -m benchmark.run
+```
+
+### Dataset categories
+
+| Category | Examples |
+|---|---|
+| option_pricing | Black-Scholes European call/put pricing |
+| greeks | Delta, Gamma, Vega, Theta, Rho |
+| var_portfolio | Parametric VaR (variance-covariance) |
+| bond_pricing | Bond price, duration, convexity |
+| compound_interest | Discrete and continuous compounding |
+| loan_amortization | Monthly payments (PMT formula) |
+| npv_irr | Net present value calculations |
+| portfolio_metrics | Sharpe ratio, weighted returns, portfolio volatility |
+| derivatives_misc | Put-call parity, forwards, swaps |
+| depreciation_tax | Straight-line, declining balance, tax shields |
+
+### Output
+
+Results are saved to `benchmark/results/benchmark_YYYYMMDD_HHMMSS.json` with per-question details and aggregate metrics (accuracy, latency, sandbox calls per category).
+
+## Monty sandbox
 
 Monty runs a **subset of Python**. Supported: arithmetic, strings, lists, dicts, functions, loops, comprehensions, type hints. Not supported: imports, classes, match statements, context managers, generators, standard library modules.
 
-## Changing the model
-
-Edit the `model_name` in `demo.py` to use any model available in your Ollama instance:
-
-```python
-ollama_model = OpenAIChatModel(
-    model_name="qwen3:8b",  # change this
-    provider=OllamaProvider(base_url="http://localhost:11434/v1"),
-)
-```
+For the benchmark, the sandbox exposes **external functions** (`sqrt`, `ln`, `exp`, `norm_cdf`, `norm_pdf`) so the LLM can write readable quant code without reimplementing math.
 
 ## Stack
 
 - [PydanticAI](https://ai.pydantic.dev/) — Agent framework
+- [DSPy](https://dspy.ai/) — Declarative LLM programming & prompt optimization
 - [pydantic-monty](https://github.com/pydantic/monty) — Secure Python sandbox (Rust)
 - [Ollama](https://ollama.com/) — Local LLM inference
 
