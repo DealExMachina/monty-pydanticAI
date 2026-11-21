@@ -63,7 +63,7 @@ def optimization_metric(
 
 def optimize(
     max_bootstrapped_demos: int = 3,
-    max_labeled_demos: int = 8,
+    max_labeled_demos: int = 0,  # 0 = no question->answer shortcuts; only bootstrapped demos with tool use
     max_rounds: int = 1,
     train_ratio: float = 0.7,
 ) -> dspy.ReAct:

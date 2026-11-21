@@ -6,6 +6,7 @@ using Python's math module -- nothing is hard-coded.
 """
 
 import math
+import random
 from dataclasses import dataclass
 
 # ---------------------------------------------------------------------------
@@ -1045,11 +1046,716 @@ def _depreciation_tax() -> list[FinancialExample]:
 
 
 # ---------------------------------------------------------------------------
+# 11. implied_volatility  (10 examples) — CODE COMPOSITION
+# ---------------------------------------------------------------------------
+
+def _implied_vol_newton(S, K, T, r, market_price, is_call=True, tol=1e-6, max_iter=100):
+    """Newton-Raphson implied volatility solver."""
+    sigma = 0.25  # initial guess
+    for _ in range(max_iter):
+        d1 = _bs_d1(S, K, T, r, sigma)
+        d2 = d1 - sigma * math.sqrt(T)
+        if is_call:
+            price = S * _norm_cdf(d1) - K * math.exp(-r * T) * _norm_cdf(d2)
+        else:
+            price = K * math.exp(-r * T) * _norm_cdf(-d2) - S * _norm_cdf(-d1)
+        vega = S * _norm_pdf(d1) * math.sqrt(T)
+        if vega < 1e-12:
+            break
+        sigma = sigma - (price - market_price) / vega
+        if abs(price - market_price) < tol:
+            break
+    return sigma
+
+
+def _implied_volatility() -> list[FinancialExample]:
+    TOL = 0.005  # 0.5% tolerance on implied vol
+    CAT = "implied_volatility"
+    examples = []
+
+    # Generate 10 examples with varying moneyness and maturity
+    params = [
+        # (S, K, T, r, true_sigma, is_call)
+        (100, 100, 1.0, 0.05, 0.20, True),   # 1) ATM call
+        (100, 100, 1.0, 0.05, 0.30, True),   # 2) ATM call, higher vol
+        (100, 110, 0.5, 0.03, 0.25, True),   # 3) OTM call
+        (100, 90, 0.5, 0.03, 0.25, False),   # 4) OTM put
+        (50, 55, 1.0, 0.04, 0.35, True),     # 5) OTM call, high vol
+        (150, 140, 0.25, 0.06, 0.18, True),  # 6) ITM call, short dated
+        (100, 100, 2.0, 0.05, 0.22, False),  # 7) ATM put, long dated
+        (80, 85, 0.75, 0.03, 0.40, True),    # 8) OTM call, very high vol
+        (200, 190, 1.0, 0.02, 0.15, False),  # 9) ITM put, low vol
+        (120, 130, 1.5, 0.05, 0.28, True),   # 10) OTM call, long dated
+    ]
+
+    for i, (S, K, T, r, true_sigma, is_call) in enumerate(params, 1):
+        # Compute the market price from the true sigma
+        if is_call:
+            market_price = _bs_call(S, K, T, r, true_sigma)
+        else:
+            market_price = _bs_put(S, K, T, r, true_sigma)
+        # Solve back for implied vol (should recover true_sigma)
+        ans = _implied_vol_newton(S, K, T, r, market_price, is_call)
+        opt_type = "call" if is_call else "put"
+        examples.append(FinancialExample(
+            question=(
+                f"Using Newton-Raphson, find the implied volatility of a European {opt_type} option "
+                f"with S={S}, K={K}, T={T}, r={r}, and market price ${market_price:.4f}. "
+                f"Start with an initial guess of sigma=0.25 and iterate until convergence."
+            ),
+            expected_answer=ans, tolerance=TOL, category=CAT))
+
+    return examples
+
+
+# ---------------------------------------------------------------------------
+# 12. numerical_greeks  (10 examples) — CODE COMPOSITION
+# ---------------------------------------------------------------------------
+
+def _numerical_delta(S, K, T, r, sigma, is_call=True, h=0.01):
+    """Finite-difference delta."""
+    if is_call:
+        return (_bs_call(S + h, K, T, r, sigma) - _bs_call(S - h, K, T, r, sigma)) / (2 * h)
+    else:
+        return (_bs_put(S + h, K, T, r, sigma) - _bs_put(S - h, K, T, r, sigma)) / (2 * h)
+
+
+def _numerical_gamma(S, K, T, r, sigma, h=0.01):
+    """Finite-difference gamma (same for call and put)."""
+    return (_bs_call(S + h, K, T, r, sigma) - 2 * _bs_call(S, K, T, r, sigma) + _bs_call(S - h, K, T, r, sigma)) / (h ** 2)
+
+
+def _numerical_vega(S, K, T, r, sigma, h=0.001):
+    """Finite-difference vega (per 1 unit of sigma)."""
+    return (_bs_call(S, K, T, r, sigma + h) - _bs_call(S, K, T, r, sigma - h)) / (2 * h)
+
+
+def _numerical_theta(S, K, T, r, sigma, is_call=True, h=1/365):
+    """Finite-difference theta (per year, forward difference)."""
+    if T - h < 0.001:
+        h = T / 2  # avoid negative time
+    if is_call:
+        return (_bs_call(S, K, T - h, r, sigma) - _bs_call(S, K, T, r, sigma)) / h
+    else:
+        return (_bs_put(S, K, T - h, r, sigma) - _bs_put(S, K, T, r, sigma)) / h
+
+
+def _numerical_greeks() -> list[FinancialExample]:
+    TOL = 0.01
+    CAT = "numerical_greeks"
+    examples = []
+
+    # 1) Numerical delta of ATM call
+    S, K, T, r, sig = 100, 100, 1.0, 0.05, 0.20
+    ans = _numerical_delta(S, K, T, r, sig, is_call=True)
+    examples.append(FinancialExample(
+        question=(f"Compute the numerical delta of a European call option using central finite differences "
+                  f"(bump size h=0.01) with S={S}, K={K}, T={T}, r={r}, sigma={sig}."),
+        expected_answer=ans, tolerance=TOL, category=CAT))
+
+    # 2) Numerical delta of OTM put
+    S, K, T, r, sig = 100, 110, 0.5, 0.03, 0.25
+    ans = _numerical_delta(S, K, T, r, sig, is_call=False)
+    examples.append(FinancialExample(
+        question=(f"Compute the numerical delta of a European put option using central finite differences "
+                  f"(bump size h=0.01) with S={S}, K={K}, T={T}, r={r}, sigma={sig}."),
+        expected_answer=ans, tolerance=TOL, category=CAT))
+
+    # 3) Numerical gamma of ATM option
+    S, K, T, r, sig = 100, 100, 1.0, 0.05, 0.20
+    ans = _numerical_gamma(S, K, T, r, sig)
+    examples.append(FinancialExample(
+        question=(f"Compute the numerical gamma of a European option using central finite differences "
+                  f"(bump size h=0.01) with S={S}, K={K}, T={T}, r={r}, sigma={sig}."),
+        expected_answer=ans, tolerance=TOL, category=CAT))
+
+    # 4) Numerical gamma of OTM option
+    S, K, T, r, sig = 50, 60, 0.5, 0.04, 0.30
+    ans = _numerical_gamma(S, K, T, r, sig)
+    examples.append(FinancialExample(
+        question=(f"Compute the numerical gamma of a European option using central finite differences "
+                  f"(bump size h=0.01) with S={S}, K={K}, T={T}, r={r}, sigma={sig}."),
+        expected_answer=ans, tolerance=TOL, category=CAT))
+
+    # 5) Numerical vega of ATM option
+    S, K, T, r, sig = 100, 100, 1.0, 0.05, 0.20
+    ans = _numerical_vega(S, K, T, r, sig)
+    examples.append(FinancialExample(
+        question=(f"Compute the numerical vega (per unit sigma) of a European option using central finite differences "
+                  f"(bump size h=0.001) with S={S}, K={K}, T={T}, r={r}, sigma={sig}."),
+        expected_answer=ans, tolerance=TOL, category=CAT))
+
+    # 6) Numerical vega of long-dated option
+    S, K, T, r, sig = 100, 105, 2.0, 0.03, 0.25
+    ans = _numerical_vega(S, K, T, r, sig)
+    examples.append(FinancialExample(
+        question=(f"Compute the numerical vega (per unit sigma) of a European option using central finite differences "
+                  f"(bump size h=0.001) with S={S}, K={K}, T={T}, r={r}, sigma={sig}."),
+        expected_answer=ans, tolerance=TOL, category=CAT))
+
+    # 7) Numerical theta of ATM call
+    S, K, T, r, sig = 100, 100, 1.0, 0.05, 0.20
+    ans = _numerical_theta(S, K, T, r, sig, is_call=True)
+    examples.append(FinancialExample(
+        question=(f"Compute the numerical theta (per year) of a European call option using forward finite differences "
+                  f"(bump size h=1/365) with S={S}, K={K}, T={T}, r={r}, sigma={sig}."),
+        expected_answer=ans, tolerance=0.1, category=CAT))  # theta is harder to match exactly
+
+    # 8) Numerical theta of put
+    S, K, T, r, sig = 95, 100, 0.5, 0.05, 0.30
+    ans = _numerical_theta(S, K, T, r, sig, is_call=False)
+    examples.append(FinancialExample(
+        question=(f"Compute the numerical theta (per year) of a European put option using forward finite differences "
+                  f"(bump size h=1/365) with S={S}, K={K}, T={T}, r={r}, sigma={sig}."),
+        expected_answer=ans, tolerance=0.1, category=CAT))
+
+    # 9) Numerical delta of deep ITM call
+    S, K, T, r, sig = 150, 100, 1.0, 0.05, 0.20
+    ans = _numerical_delta(S, K, T, r, sig, is_call=True)
+    examples.append(FinancialExample(
+        question=(f"Compute the numerical delta of a European call option using central finite differences "
+                  f"(bump size h=0.01) with S={S}, K={K}, T={T}, r={r}, sigma={sig}."),
+        expected_answer=ans, tolerance=TOL, category=CAT))
+
+    # 10) Numerical gamma of high-vol option
+    S, K, T, r, sig = 100, 100, 0.5, 0.05, 0.50
+    ans = _numerical_gamma(S, K, T, r, sig)
+    examples.append(FinancialExample(
+        question=(f"Compute the numerical gamma of a European option using central finite differences "
+                  f"(bump size h=0.01) with S={S}, K={K}, T={T}, r={r}, sigma={sig}."),
+        expected_answer=ans, tolerance=TOL, category=CAT))
+
+    return examples
+
+
+# ---------------------------------------------------------------------------
+# 13. multi_leg_options  (10 examples) — CODE COMPOSITION
+# ---------------------------------------------------------------------------
+
+def _multi_leg_options() -> list[FinancialExample]:
+    TOL = 0.10
+    CAT = "multi_leg_options"
+    examples = []
+
+    # 1) Long straddle: net premium
+    call_prem, put_prem = 5.50, 4.80
+    ans = call_prem + put_prem
+    examples.append(FinancialExample(
+        question=("Calculate the total premium paid for a long straddle with a call premium of $5.50 "
+                  "and a put premium of $4.80, both at strike $100."),
+        expected_answer=ans, tolerance=TOL, category=CAT))
+
+    # 2) Long straddle: profit at expiry S_T=115
+    K, S_T = 100, 115
+    total_prem = call_prem + put_prem
+    ans = max(S_T - K, 0) + max(K - S_T, 0) - total_prem
+    examples.append(FinancialExample(
+        question=("Calculate the profit of a long straddle at expiry with strike $100, call premium $5.50, "
+                  "put premium $4.80, and stock price at expiry $115."),
+        expected_answer=ans, tolerance=TOL, category=CAT))
+
+    # 3) Long straddle: profit at expiry S_T=92
+    S_T = 92
+    ans = max(S_T - K, 0) + max(K - S_T, 0) - total_prem
+    examples.append(FinancialExample(
+        question=("Calculate the profit of a long straddle at expiry with strike $100, call premium $5.50, "
+                  "put premium $4.80, and stock price at expiry $92."),
+        expected_answer=ans, tolerance=TOL, category=CAT))
+
+    # 4) Bull call spread: max profit
+    K1, K2 = 100, 110
+    prem1, prem2 = 8.0, 3.0  # buy K1, sell K2
+    net_debit = prem1 - prem2
+    ans = (K2 - K1) - net_debit  # max profit
+    examples.append(FinancialExample(
+        question=("Calculate the maximum profit of a bull call spread: buy a call at strike $100 for $8.00, "
+                  "sell a call at strike $110 for $3.00."),
+        expected_answer=ans, tolerance=TOL, category=CAT))
+
+    # 5) Bull call spread: profit at S_T=105
+    S_T = 105
+    payoff = max(S_T - K1, 0) - max(S_T - K2, 0) - net_debit
+    ans = payoff
+    examples.append(FinancialExample(
+        question=("Calculate the profit of a bull call spread at expiry: buy call K=$100 for $8.00, "
+                  "sell call K=$110 for $3.00. Stock price at expiry is $105."),
+        expected_answer=ans, tolerance=TOL, category=CAT))
+
+    # 6) Iron condor: net credit received
+    put_sell_K, put_buy_K = 95, 90
+    call_sell_K, call_buy_K = 105, 110
+    put_sell_prem, put_buy_prem = 3.20, 1.50
+    call_sell_prem, call_buy_prem = 2.80, 1.00
+    net_credit = (put_sell_prem - put_buy_prem) + (call_sell_prem - call_buy_prem)
+    ans = net_credit
+    examples.append(FinancialExample(
+        question=("Calculate the net credit received for an iron condor: sell put K=$95 for $3.20, "
+                  "buy put K=$90 for $1.50, sell call K=$105 for $2.80, buy call K=$110 for $1.00."),
+        expected_answer=ans, tolerance=TOL, category=CAT))
+
+    # 7) Iron condor: max loss
+    put_wing = put_sell_K - put_buy_K  # 5
+    call_wing = call_buy_K - call_sell_K  # 5
+    max_wing = max(put_wing, call_wing)
+    ans = max_wing - net_credit
+    examples.append(FinancialExample(
+        question=("Calculate the maximum loss of an iron condor: sell put K=$95 ($3.20), buy put K=$90 ($1.50), "
+                  "sell call K=$105 ($2.80), buy call K=$110 ($1.00)."),
+        expected_answer=ans, tolerance=TOL, category=CAT))
+
+    # 8) Iron condor: profit at S_T=100 (between the short strikes)
+    S_T = 100
+    put_payoff = -max(put_sell_K - S_T, 0) + max(put_buy_K - S_T, 0)
+    call_payoff = -max(S_T - call_sell_K, 0) + max(S_T - call_buy_K, 0)
+    ans = net_credit + put_payoff + call_payoff
+    examples.append(FinancialExample(
+        question=("Calculate the profit of an iron condor at expiry with S_T=$100: sell put K=$95 ($3.20), "
+                  "buy put K=$90 ($1.50), sell call K=$105 ($2.80), buy call K=$110 ($1.00)."),
+        expected_answer=ans, tolerance=TOL, category=CAT))
+
+    # 9) Butterfly spread: max profit
+    K_low, K_mid, K_high = 95, 100, 105
+    prem_low, prem_mid, prem_high = 8.50, 5.00, 2.50
+    net_debit_bf = prem_low - 2 * prem_mid + prem_high
+    ans = (K_mid - K_low) - net_debit_bf  # max profit at K_mid
+    examples.append(FinancialExample(
+        question=("Calculate the maximum profit of a long call butterfly spread: buy call K=$95 for $8.50, "
+                  "sell 2 calls K=$100 for $5.00 each, buy call K=$105 for $2.50."),
+        expected_answer=ans, tolerance=TOL, category=CAT))
+
+    # 10) Butterfly spread: profit at S_T=98
+    S_T = 98
+    payoff_bf = max(S_T - K_low, 0) - 2 * max(S_T - K_mid, 0) + max(S_T - K_high, 0) - net_debit_bf
+    ans = payoff_bf
+    examples.append(FinancialExample(
+        question=("Calculate the profit of a long call butterfly at expiry with S_T=$98: buy call K=$95 ($8.50), "
+                  "sell 2 calls K=$100 ($5.00 each), buy call K=$105 ($2.50)."),
+        expected_answer=ans, tolerance=TOL, category=CAT))
+
+    return examples
+
+
+# ---------------------------------------------------------------------------
+# 14. structured_products  (10 examples) — CODE COMPOSITION
+# ---------------------------------------------------------------------------
+
+def _structured_products() -> list[FinancialExample]:
+    TOL = 0.10
+    CAT = "structured_products"
+    examples = []
+
+    # 1) Capital-protected note: 100% protection, 80% participation, no cap
+    notional = 1000
+    protection = 1.0  # 100%
+    participation = 0.80
+    S0, ST = 100, 130
+    ret = (ST - S0) / S0  # 30%
+    ans = notional * (protection + participation * max(ret, 0))
+    examples.append(FinancialExample(
+        question=("Calculate the payoff of a capital-protected note with notional $1000, "
+                  "100% capital protection, 80% participation rate, initial price $100, "
+                  "and final price $130."),
+        expected_answer=ans, tolerance=TOL, category=CAT))
+
+    # 2) Capital-protected note: market goes down
+    ST = 85
+    ret = (ST - S0) / S0
+    ans = notional * (protection + participation * max(ret, 0))
+    examples.append(FinancialExample(
+        question=("Calculate the payoff of a capital-protected note with notional $1000, "
+                  "100% capital protection, 80% participation rate, initial price $100, "
+                  "and final price $85."),
+        expected_answer=ans, tolerance=TOL, category=CAT))
+
+    # 3) Capital-protected note with cap
+    participation = 0.90
+    cap = 0.20  # 20% max return
+    ST = 150
+    ret = (ST - S0) / S0
+    capped_ret = min(max(ret, 0), cap)
+    ans = notional * (protection + participation * capped_ret)
+    examples.append(FinancialExample(
+        question=("Calculate the payoff of a capital-protected note with notional $1000, "
+                  "100% protection, 90% participation, 20% return cap, initial price $100, "
+                  "and final price $150."),
+        expected_answer=ans, tolerance=TOL, category=CAT))
+
+    # 4) Partial protection note (90%)
+    protection = 0.90
+    participation = 1.0
+    ST = 80
+    ret = (ST - S0) / S0
+    # If market falls, lose up to (1 - protection) of notional
+    if ret < 0:
+        ans = notional * max(protection, 1 + ret)
+    else:
+        ans = notional * (1 + participation * ret)
+    examples.append(FinancialExample(
+        question=("Calculate the payoff of a partially protected note with notional $1000, "
+                  "90% capital protection, 100% participation, initial price $100, "
+                  "and final price $80. If the market falls, the investor loses proportionally "
+                  "but is guaranteed at least 90% of notional."),
+        expected_answer=ans, tolerance=TOL, category=CAT))
+
+    # 5) Partial protection note, market up
+    ST = 120
+    ret = (ST - S0) / S0
+    if ret < 0:
+        ans = notional * max(protection, 1 + ret)
+    else:
+        ans = notional * (1 + participation * ret)
+    examples.append(FinancialExample(
+        question=("Calculate the payoff of a partially protected note with notional $1000, "
+                  "90% capital protection, 100% participation, initial price $100, "
+                  "and final price $120. If the market falls, the investor loses proportionally "
+                  "but is guaranteed at least 90% of notional."),
+        expected_answer=ans, tolerance=TOL, category=CAT))
+
+    # 6) Reverse convertible: coupon + conditional principal
+    notional = 1000
+    coupon_rate = 0.10
+    barrier = 0.80  # 80% of initial
+    S0, ST = 50, 35
+    coupon = notional * coupon_rate
+    if ST >= S0 * barrier:
+        ans = notional + coupon
+    else:
+        ans = notional * (ST / S0) + coupon
+    examples.append(FinancialExample(
+        question=("Calculate the payoff of a reverse convertible note with notional $1000, "
+                  "10% coupon, barrier at 80% of initial price, S0=$50, ST=$35. "
+                  "If ST >= barrier, return notional + coupon. Otherwise, return "
+                  "notional * (ST/S0) + coupon."),
+        expected_answer=ans, tolerance=TOL, category=CAT))
+
+    # 7) Reverse convertible: above barrier
+    ST = 45
+    coupon = notional * coupon_rate
+    if ST >= S0 * barrier:
+        ans = notional + coupon
+    else:
+        ans = notional * (ST / S0) + coupon
+    examples.append(FinancialExample(
+        question=("Calculate the payoff of a reverse convertible note with notional $1000, "
+                  "10% coupon, barrier at 80% of initial price, S0=$50, ST=$45. "
+                  "If ST >= barrier, return notional + coupon. Otherwise, return "
+                  "notional * (ST/S0) + coupon."),
+        expected_answer=ans, tolerance=TOL, category=CAT))
+
+    # 8) Capped + floored return note
+    notional = 10000
+    floor_ret = -0.05
+    cap_ret = 0.15
+    participation = 1.0
+    S0, ST = 100, 125
+    ret = (ST - S0) / S0
+    adj_ret = max(floor_ret, min(ret, cap_ret))
+    ans = notional * (1 + participation * adj_ret)
+    examples.append(FinancialExample(
+        question=("Calculate the payoff of a capped-and-floored note with notional $10,000, "
+                  "return floor -5%, return cap 15%, 100% participation, S0=$100, ST=$125. "
+                  "The adjusted return is clamped between the floor and cap."),
+        expected_answer=ans, tolerance=TOL, category=CAT))
+
+    # 9) Capped + floored return note, market drops
+    ST = 70
+    ret = (ST - S0) / S0
+    adj_ret = max(floor_ret, min(ret, cap_ret))
+    ans = notional * (1 + participation * adj_ret)
+    examples.append(FinancialExample(
+        question=("Calculate the payoff of a capped-and-floored note with notional $10,000, "
+                  "return floor -5%, return cap 15%, 100% participation, S0=$100, ST=$70. "
+                  "The adjusted return is clamped between the floor and cap."),
+        expected_answer=ans, tolerance=TOL, category=CAT))
+
+    # 10) Twin-win certificate: absolute return with cap
+    notional = 5000
+    participation = 0.90
+    cap = 0.25
+    S0, ST = 100, 80
+    ret = (ST - S0) / S0
+    abs_ret = abs(ret)
+    capped_abs_ret = min(abs_ret, cap)
+    ans = notional * (1 + participation * capped_abs_ret)
+    examples.append(FinancialExample(
+        question=("Calculate the payoff of a twin-win certificate with notional $5000, "
+                  "90% participation, 25% absolute return cap, S0=$100, ST=$80. "
+                  "The payoff uses the absolute return (positive whether market goes up or down), "
+                  "capped at 25%, times participation."),
+        expected_answer=ans, tolerance=TOL, category=CAT))
+
+    return examples
+
+
+# ---------------------------------------------------------------------------
+# 15. amortization_events  (10 examples) — CODE COMPOSITION
+# ---------------------------------------------------------------------------
+
+def _amortization_events() -> list[FinancialExample]:
+    TOL = 1.0  # dollar tolerance for loan balances/totals
+    CAT = "amortization_events"
+    examples = []
+
+    # Helper: simulate month-by-month with events
+    def _simulate_loan(principal, annual_rate, years, events=None):
+        """Simulate loan with events. events is list of (month, type, value).
+        type: 'extra_payment' or 'rate_change'.
+        Returns (final_balance, total_interest, total_paid, months_to_payoff).
+        """
+        if events is None:
+            events = []
+        event_map = {}
+        for (m, etype, val) in events:
+            event_map[m] = (etype, val)
+
+        r = annual_rate / 12.0
+        n = years * 12
+        # Original monthly payment
+        if r > 0:
+            pmt = principal * r * (1 + r) ** n / ((1 + r) ** n - 1)
+        else:
+            pmt = principal / n
+
+        balance = principal
+        total_interest = 0.0
+        total_paid = 0.0
+        months = 0
+
+        for month in range(1, n + 1):
+            if balance <= 0:
+                break
+            months = month
+
+            # Check for rate change
+            if month in event_map and event_map[month][0] == 'rate_change':
+                annual_rate = event_map[month][1]
+                r = annual_rate / 12.0
+                remaining = n - month + 1
+                if r > 0 and remaining > 0:
+                    pmt = balance * r * (1 + r) ** remaining / ((1 + r) ** remaining - 1)
+                elif remaining > 0:
+                    pmt = balance / remaining
+
+            interest = balance * r
+            principal_pay = pmt - interest
+            balance -= principal_pay
+            total_interest += interest
+            total_paid += pmt
+
+            # Check for extra payment
+            if month in event_map and event_map[month][0] == 'extra_payment':
+                extra = min(event_map[month][1], max(balance, 0))
+                balance -= extra
+                total_paid += extra
+
+            if balance < 0.01:
+                balance = 0.0
+                break
+
+        return balance, total_interest, total_paid, months
+
+    # 1) Extra payment of $10,000 at month 12
+    P, rate, yrs = 200000, 0.06, 30
+    _, total_int, _, _ = _simulate_loan(P, rate, yrs, [(12, 'extra_payment', 10000)])
+    ans = total_int
+    examples.append(FinancialExample(
+        question=("Calculate the total interest paid on a $200,000 mortgage at 6.0% annual interest "
+                  "over 30 years, if an extra payment of $10,000 is made at month 12."),
+        expected_answer=ans, tolerance=TOL, category=CAT))
+
+    # 2) Remaining balance after 60 months with extra payment at month 24
+    _, _, _, _ = _simulate_loan(P, rate, yrs, [(24, 'extra_payment', 5000)])
+    # Need balance at month 60
+    r_m = rate / 12.0
+    n_total = yrs * 12
+    pmt = P * r_m * (1 + r_m) ** n_total / ((1 + r_m) ** n_total - 1)
+    balance = P
+    for month in range(1, 61):
+        interest = balance * r_m
+        principal_pay = pmt - interest
+        balance -= principal_pay
+        if month == 24:
+            balance -= 5000
+    ans = balance
+    examples.append(FinancialExample(
+        question=("Calculate the remaining balance after 60 months on a $200,000 mortgage at 6.0% "
+                  "(30-year term) if a $5,000 extra payment is made at month 24."),
+        expected_answer=ans, tolerance=TOL, category=CAT))
+
+    # 3) Rate change at month 60 from 5% to 7%, total interest
+    P, rate, yrs = 300000, 0.05, 30
+    _, total_int, _, _ = _simulate_loan(P, rate, yrs, [(60, 'rate_change', 0.07)])
+    ans = total_int
+    examples.append(FinancialExample(
+        question=("Calculate the total interest paid on a $300,000 mortgage starting at 5.0% "
+                  "(30-year term) if the rate changes to 7.0% at month 60 and the payment is recalculated."),
+        expected_answer=ans, tolerance=TOL, category=CAT))
+
+    # 4) Rate decrease at month 36, remaining balance at month 120
+    P, rate, yrs = 250000, 0.065, 30
+    r_m = rate / 12.0
+    n_total = yrs * 12
+    pmt = P * r_m * (1 + r_m) ** n_total / ((1 + r_m) ** n_total - 1)
+    balance = P
+    for month in range(1, 121):
+        if month == 36:
+            new_rate = 0.04
+            r_m = new_rate / 12.0
+            remaining = n_total - month + 1
+            pmt = balance * r_m * (1 + r_m) ** remaining / ((1 + r_m) ** remaining - 1)
+        interest = balance * r_m
+        principal_pay = pmt - interest
+        balance -= principal_pay
+    ans = balance
+    examples.append(FinancialExample(
+        question=("Calculate the remaining balance at month 120 on a $250,000 mortgage starting at 6.5% "
+                  "(30-year term) if the rate drops to 4.0% at month 36 and the payment is recalculated."),
+        expected_answer=ans, tolerance=TOL, category=CAT))
+
+    # 5) Two extra payments: $3000 at month 12 and $3000 at month 24, total interest
+    P, rate, yrs = 150000, 0.055, 20
+    _, total_int, _, _ = _simulate_loan(P, rate, yrs, [
+        (12, 'extra_payment', 3000), (24, 'extra_payment', 3000)
+    ])
+    ans = total_int
+    examples.append(FinancialExample(
+        question=("Calculate the total interest paid on a $150,000 loan at 5.5% over 20 years, "
+                  "if extra payments of $3,000 are made at month 12 and month 24."),
+        expected_answer=ans, tolerance=TOL, category=CAT))
+
+    # 6) Extra payment, balance at month 36
+    P, rate, yrs = 100000, 0.07, 15
+    r_m = rate / 12.0
+    n_total = yrs * 12
+    pmt = P * r_m * (1 + r_m) ** n_total / ((1 + r_m) ** n_total - 1)
+    balance = P
+    for month in range(1, 37):
+        interest = balance * r_m
+        principal_pay = pmt - interest
+        balance -= principal_pay
+        if month == 6:
+            balance -= 2000
+    ans = balance
+    examples.append(FinancialExample(
+        question=("Calculate the remaining balance at month 36 on a $100,000 loan at 7.0% "
+                  "(15-year term) if a $2,000 extra payment is made at month 6."),
+        expected_answer=ans, tolerance=TOL, category=CAT))
+
+    # 7) Rate change + extra payment
+    P, rate, yrs = 400000, 0.06, 30
+    r_m = rate / 12.0
+    n_total = yrs * 12
+    pmt = P * r_m * (1 + r_m) ** n_total / ((1 + r_m) ** n_total - 1)
+    balance = P
+    total_int = 0.0
+    for month in range(1, n_total + 1):
+        if balance <= 0:
+            break
+        if month == 60:
+            rate = 0.05
+            r_m = rate / 12.0
+            remaining = n_total - month + 1
+            pmt = balance * r_m * (1 + r_m) ** remaining / ((1 + r_m) ** remaining - 1)
+        interest = balance * r_m
+        principal_pay = pmt - interest
+        balance -= principal_pay
+        total_int += interest
+        if month == 120:
+            extra = min(20000, max(balance, 0))
+            balance -= extra
+    ans = total_int
+    examples.append(FinancialExample(
+        question=("Calculate the total interest paid on a $400,000 mortgage starting at 6.0% (30-year term) "
+                  "if the rate changes to 5.0% at month 60 (payment recalculated) and "
+                  "a $20,000 extra payment is made at month 120."),
+        expected_answer=ans, tolerance=TOL, category=CAT))
+
+    # 8) Monthly payment after refinancing
+    P, rate, yrs = 350000, 0.065, 30
+    r_m = rate / 12.0
+    n_total = yrs * 12
+    pmt = P * r_m * (1 + r_m) ** n_total / ((1 + r_m) ** n_total - 1)
+    balance = P
+    for month in range(1, 61):
+        interest = balance * r_m
+        principal_pay = pmt - interest
+        balance -= principal_pay
+    # Refinance remaining balance at 4.5% for 25 years
+    new_rate = 0.045
+    new_r_m = new_rate / 12.0
+    new_n = 25 * 12
+    new_pmt = balance * new_r_m * (1 + new_r_m) ** new_n / ((1 + new_r_m) ** new_n - 1)
+    ans = new_pmt
+    examples.append(FinancialExample(
+        question=("A $350,000 mortgage at 6.5% (30-year term) is refinanced after 60 months at 4.5% "
+                  "for a new 25-year term. Calculate the new monthly payment after refinancing."),
+        expected_answer=ans, tolerance=TOL, category=CAT))
+
+    # 9) Interest savings from extra payments
+    P, rate, yrs = 200000, 0.06, 30
+    _, int_no_extra, _, _ = _simulate_loan(P, rate, yrs, [])
+    _, int_with_extra, _, _ = _simulate_loan(P, rate, yrs, [
+        (12, 'extra_payment', 5000), (24, 'extra_payment', 5000), (36, 'extra_payment', 5000)
+    ])
+    ans = int_no_extra - int_with_extra
+    examples.append(FinancialExample(
+        question=("Calculate the total interest savings on a $200,000 mortgage at 6.0% (30-year term) "
+                  "from making extra payments of $5,000 at months 12, 24, and 36, compared to no extra payments."),
+        expected_answer=ans, tolerance=TOL, category=CAT))
+
+    # 10) Balance at month 60 with two rate changes
+    P, rate, yrs = 500000, 0.055, 30
+    r_m = rate / 12.0
+    n_total = yrs * 12
+    pmt = P * r_m * (1 + r_m) ** n_total / ((1 + r_m) ** n_total - 1)
+    balance = P
+    for month in range(1, 61):
+        if month == 24:
+            rate = 0.07
+            r_m = rate / 12.0
+            remaining = n_total - month + 1
+            pmt = balance * r_m * (1 + r_m) ** remaining / ((1 + r_m) ** remaining - 1)
+        if month == 48:
+            rate = 0.045
+            r_m = rate / 12.0
+            remaining = n_total - month + 1
+            pmt = balance * r_m * (1 + r_m) ** remaining / ((1 + r_m) ** remaining - 1)
+        interest = balance * r_m
+        principal_pay = pmt - interest
+        balance -= principal_pay
+    ans = balance
+    examples.append(FinancialExample(
+        question=("Calculate the remaining balance at month 60 on a $500,000 mortgage starting at 5.5% "
+                  "(30-year term) with rate changes to 7.0% at month 24 and 4.5% at month 48 "
+                  "(payment recalculated at each change)."),
+        expected_answer=ans, tolerance=TOL, category=CAT))
+
+    return examples
+
+
+# ---------------------------------------------------------------------------
+# Category tagging
+# ---------------------------------------------------------------------------
+
+SINGLE_FORMULA_CATEGORIES = {
+    "option_pricing", "greeks", "var_portfolio", "bond_pricing",
+    "compound_interest", "loan_amortization", "npv_irr",
+    "portfolio_metrics", "derivatives_misc", "depreciation_tax",
+}
+
+CODE_COMPOSITION_CATEGORIES = {
+    "implied_volatility", "numerical_greeks", "multi_leg_options",
+    "structured_products", "amortization_events",
+}
+
+
+# ---------------------------------------------------------------------------
 # Main loader
 # ---------------------------------------------------------------------------
 
 def load_dataset() -> list[FinancialExample]:
     examples = []
+    # Single-formula categories (100 questions)
     examples.extend(_option_pricing())
     examples.extend(_greeks())
     examples.extend(_var_portfolio())
@@ -1060,7 +1766,30 @@ def load_dataset() -> list[FinancialExample]:
     examples.extend(_portfolio_metrics())
     examples.extend(_derivatives_misc())
     examples.extend(_depreciation_tax())
+    # Code-composition categories (50 questions)
+    examples.extend(_implied_volatility())
+    examples.extend(_numerical_greeks())
+    examples.extend(_multi_leg_options())
+    examples.extend(_structured_products())
+    examples.extend(_amortization_events())
     return examples
+
+
+def load_dataset_split(
+    train_ratio: float = 0.7,
+    seed: int = 42,
+) -> tuple[list[FinancialExample], list[FinancialExample]]:
+    """Split dataset into train and test with deterministic shuffle.
+
+    Returns (train, test). Use test portion for DSPy optimized evaluation
+    to detect overfitting (optimized model was trained on train only).
+    """
+    examples = load_dataset()
+    shuffled = examples.copy()
+    rng = random.Random(seed)
+    rng.shuffle(shuffled)
+    split_idx = int(len(shuffled) * train_ratio)
+    return shuffled[:split_idx], shuffled[split_idx:]
 
 
 # ---------------------------------------------------------------------------
@@ -1081,18 +1810,25 @@ def as_dspy_examples(examples: list[FinancialExample]) -> list:
 
 def verify_dataset():
     ds = load_dataset()
-    assert len(ds) == 100, f"Expected 100, got {len(ds)}"
+    assert len(ds) == 150, f"Expected 150, got {len(ds)}"
     for ex in ds:
         assert math.isfinite(ex.expected_answer), f"Bad: {ex.question}"
         assert ex.tolerance > 0
     cats = set(ex.category for ex in ds)
-    assert len(cats) == 10, f"Expected 10 categories, got {len(cats)}"
+    assert len(cats) == 15, f"Expected 15 categories, got {len(cats)}"
     for cat in cats:
         count = sum(1 for ex in ds if ex.category == cat)
         assert count == 10, f"Category {cat} has {count} examples, expected 10"
+
+    sf_count = sum(1 for ex in ds if ex.category in SINGLE_FORMULA_CATEGORIES)
+    cc_count = sum(1 for ex in ds if ex.category in CODE_COMPOSITION_CATEGORIES)
+
     print(f"Dataset OK: {len(ds)} examples, {len(cats)} categories")
+    print(f"  Single-formula: {sf_count} questions ({len(SINGLE_FORMULA_CATEGORIES)} categories)")
+    print(f"  Code-composition: {cc_count} questions ({len(CODE_COMPOSITION_CATEGORIES)} categories)")
     for cat in sorted(cats):
-        print(f"  {cat}: 10 examples")
+        tag = "SF" if cat in SINGLE_FORMULA_CATEGORIES else "CC"
+        print(f"  [{tag}] {cat}: 10 examples")
 
 
 if __name__ == "__main__":

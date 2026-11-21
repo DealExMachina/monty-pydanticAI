@@ -22,6 +22,8 @@ class AgentResult:
     sandbox_success: bool  # did at least one sandbox call succeed?
     wall_time_s: float  # total wall-clock seconds
     error: str | None = None
+    prompt_tokens: int = 0
+    completion_tokens: int = 0
 
 
 @dataclass
@@ -39,6 +41,8 @@ class QuestionMetrics:
     wall_time_s: float
     sandbox_calls: int
     error: str | None
+    prompt_tokens: int = 0
+    completion_tokens: int = 0
 
 
 @dataclass
@@ -57,6 +61,10 @@ class AggregateMetrics:
     mean_sandbox_calls: float
     total_errors: int
     category_accuracy: dict[str, float] = field(default_factory=dict)
+    mean_prompt_tokens: float = 0.0
+    mean_completion_tokens: float = 0.0
+    total_tokens: int = 0
+    estimated_cost_usd: float = 0.0
 
 
 # ── Evaluation functions ────────────────────────────────────────────
@@ -92,6 +100,8 @@ def evaluate_single(
         wall_time_s=result.wall_time_s,
         sandbox_calls=result.sandbox_calls,
         error=result.error,
+        prompt_tokens=result.prompt_tokens,
+        completion_tokens=result.completion_tokens,
     )
 
 
@@ -113,6 +123,16 @@ def aggregate(metrics: list[QuestionMetrics]) -> AggregateMetrics:
     p95_time = times[min(p95_idx, len(times) - 1)]
 
     mean_calls = sum(m.sandbox_calls for m in metrics) / total
+
+    total_prompt = sum(m.prompt_tokens for m in metrics)
+    total_completion = sum(m.completion_tokens for m in metrics)
+    total_tokens = total_prompt + total_completion
+    mean_prompt_tokens = total_prompt / total if total > 0 else 0.0
+    mean_completion_tokens = total_completion / total if total > 0 else 0.0
+
+    # Rough cost estimate for Nemotron (self-hosted vLLM: assume $0 or nominal)
+    # Placeholder: $0.0001 per 1K tokens if pricing unknown
+    estimated_cost_usd = (total_tokens / 1000.0) * 0.0001 if total_tokens > 0 else 0.0
 
     # Per-category breakdown
     cat_correct: dict[str, int] = defaultdict(int)
@@ -138,4 +158,8 @@ def aggregate(metrics: list[QuestionMetrics]) -> AggregateMetrics:
         mean_sandbox_calls=mean_calls,
         total_errors=errors,
         category_accuracy=cat_accuracy,
+        mean_prompt_tokens=mean_prompt_tokens,
+        mean_completion_tokens=mean_completion_tokens,
+        total_tokens=total_tokens,
+        estimated_cost_usd=estimated_cost_usd,
     )

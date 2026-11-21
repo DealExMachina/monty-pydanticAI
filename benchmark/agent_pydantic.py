@@ -1,7 +1,9 @@
 """PydanticAI agent runner for the benchmark.
 
-Creates a PydanticAI Agent with a run_python tool that calls the shared
-Monty sandbox. Returns structured AgentResult for evaluation.
+Creates a PydanticAI Agent with a stateful_python_code_exec tool that calls
+the shared Monty sandbox. The tool is named to match Nemotron's trained tool
+name so the model naturally calls it without hallucinating an unknown tool.
+Returns structured AgentResult for evaluation.
 """
 
 from __future__ import annotations
@@ -12,11 +14,17 @@ import time
 
 from pydantic_ai import Agent
 from pydantic_ai.models.openai import OpenAIChatModel
-from pydantic_ai.providers.ollama import OllamaProvider
+from pydantic_ai.providers.openai import OpenAIProvider
 from pydantic_ai.settings import ModelSettings
 
 from benchmark.metrics import AgentResult
 from benchmark.sandbox import SandboxSession, EXTERNAL_FUNCTION_NAMES
+
+# ── Model configuration ─────────────────────────────────────────────
+
+VLLM_BASE_URL = "https://nemotron-3-inference-dealexmachina-53d19e1c.koyeb.app/v1"
+VLLM_MODEL = "nemotron"
+VLLM_API_KEY = "dummy"  # vLLM doesn't require auth but the client needs a value
 
 # ── Number extraction ───────────────────────────────────────────────
 
@@ -67,17 +75,19 @@ def extract_number(text: str) -> float | None:
 
 SYSTEM_PROMPT = """\
 You are a quantitative finance calculator. When asked a calculation,
-use the `run_python` tool to execute code in a sandboxed Python environment.
+use the `stateful_python_code_exec` tool to execute code in a sandboxed Python environment.
 
-## Available math functions (no import needed)
-The sandbox provides these functions directly — just call them:
-- sqrt(x)    — square root
-- ln(x)      — natural logarithm
-- exp(x)     — exponential (e^x)
+## External math functions (no import needed)
+These are provided by the sandbox — call them directly:
+- sqrt(x)     — square root
+- ln(x)       — natural logarithm
+- exp(x)      — exponential (e^x)
 - norm_cdf(x) — standard normal CDF (cumulative distribution)
 - norm_pdf(x) — standard normal PDF (density)
-- abs(x)     — absolute value
-- max_val(a, b) — maximum of two values
+
+## Native Python builtins (always available)
+- min(), max(), abs(), round(), sum(), len(), range(), pow(), sorted(), enumerate()
+- for/while loops, if/else, function definitions (def), list comprehensions
 
 ## Code formatting (CRITICAL)
 - All top-level statements MUST start at column 0 (no leading spaces).
@@ -103,22 +113,36 @@ ANSWER: <number>
 
 def _build_agent(session: SandboxSession) -> Agent:
     """Build a fresh PydanticAI agent bound to a SandboxSession."""
-    ollama_model = OpenAIChatModel(
-        model_name="qwen3:8b",
-        provider=OllamaProvider(base_url="http://localhost:11434/v1"),
+    model = OpenAIChatModel(
+        model_name=VLLM_MODEL,
+        provider=OpenAIProvider(base_url=VLLM_BASE_URL, api_key=VLLM_API_KEY),
     )
     agent = Agent(
-        ollama_model,
+        model,
         system_prompt=SYSTEM_PROMPT,
         model_settings=ModelSettings(temperature=0.3),
+        # NOTE: To force the model to always call our tool (no free-text), add:
+        #   extra_body={"tool_choice": {"type": "function",
+        #               "function": {"name": "stateful_python_code_exec"}}}
+        # to ModelSettings. This uses vLLM structured output to guarantee the
+        # model emits a valid tool call. Kept off by default so the model can
+        # also answer directly when no calculation is needed.
+        retries=3,  # tool call retries (default 1); more attempts for Monty syntax errors
+        output_retries=3,  # retry on validation failure to reduce spurious abort
     )
 
     @agent.tool_plain
-    def run_python(code: str) -> str:
-        """Execute Python code in a secure Monty sandbox.
+    def stateful_python_code_exec(code: str) -> str:
+        """Execute Python code in a sandboxed environment.
 
-        Available math functions (call directly, no import):
-        sqrt, ln, exp, norm_cdf, norm_pdf, abs, max_val.
+        External math functions (call directly, no import):
+        sqrt, ln, exp, norm_cdf, norm_pdf.
+
+        Native builtins also available:
+        min, max, abs, round, sum, len, range, pow, sorted, enumerate.
+
+        Supports for/while loops, if/else, function definitions (def),
+        and list comprehensions.
 
         All top-level statements must start at column 0.
         Use 4 spaces for indentation inside blocks.
@@ -158,6 +182,20 @@ async def run_pydantic_agent(question: str) -> AgentResult:
         if extracted is None:
             extracted = extract_number(raw_answer)
 
+        # Token usage from PydanticAI
+        prompt_tokens, completion_tokens = 0, 0
+        try:
+            usage = result.usage()
+            if usage:
+                prompt_tokens = getattr(usage, "request_tokens", None) or getattr(
+                    usage, "input_tokens", 0
+                )
+                completion_tokens = getattr(usage, "response_tokens", None) or getattr(
+                    usage, "output_tokens", 0
+                )
+        except Exception:
+            pass
+
         return AgentResult(
             agent_name="pydantic_ai",
             question=question,
@@ -166,6 +204,8 @@ async def run_pydantic_agent(question: str) -> AgentResult:
             sandbox_calls=session.call_count,
             sandbox_success=any(r.success for r in session.results),
             wall_time_s=wall_time,
+            prompt_tokens=prompt_tokens,
+            completion_tokens=completion_tokens,
         )
     except Exception as exc:
         wall_time = time.perf_counter() - t0
@@ -178,4 +218,6 @@ async def run_pydantic_agent(question: str) -> AgentResult:
             sandbox_success=False,
             wall_time_s=wall_time,
             error=str(exc),
+            prompt_tokens=0,
+            completion_tokens=0,
         )

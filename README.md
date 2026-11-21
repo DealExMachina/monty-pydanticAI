@@ -56,15 +56,16 @@ Agent > La somme des carrés des 10 premiers entiers est **385**.
 
 ## Benchmark: PydanticAI vs DSPy ReAct
 
-The `benchmark/` directory compares three agent approaches on **100 quantitative finance calculations** (Black-Scholes, Greeks, VaR, bond pricing, NPV, Sharpe ratio, etc.):
+The `benchmark/` directory compares agent approaches on **100 quantitative finance calculations** (Black-Scholes, Greeks, VaR, bond pricing, NPV, Sharpe ratio, etc.):
 
 | Agent | Description |
 |---|---|
 | **PydanticAI + Monty** | Hand-crafted system prompt |
 | **DSPy ReAct + Monty** | DSPy vanilla (auto-generated prompt) |
 | **DSPy ReAct optimized** | After BootstrapFewShot optimization |
+| **Direct (baseline)** | No tools; LLM reasoning only — use `--direct` |
 
-All three use the same model (`qwen3:8b` via Ollama) and the same Monty sandbox with math external functions (`sqrt`, `ln`, `exp`, `norm_cdf`, `norm_pdf`).
+**Benchmark model:** The benchmark requires **Nemotron** (vLLM on a Koyeb endpoint). Ollama is used only for the interactive `demo.py`.
 
 ### Run the benchmark
 
@@ -78,10 +79,28 @@ uv run python -m benchmark.run --limit 3 --no-dspy --no-optimized
 # Full benchmark (all 3 agents, 100 questions each)
 uv run python -m benchmark.run
 
+# Include no-tools baseline to measure sandbox value
+uv run python -m benchmark.run --direct
+
+# DSPy optimization on held-out test set (recommended for fair comparison)
+uv run python -m benchmark.run --dspy-optimized-on-test
+
 # DSPy optimization (optional, ~30-60 min)
 uv run python -m benchmark.agent_dspy_optimized
 uv run python -m benchmark.run
 ```
+
+### Benchmark flags
+
+| Flag | Description |
+|---|---|
+| `--limit N` | Run on first N questions only |
+| `--concurrency N` | Parallel requests (default: 4) |
+| `--direct` | Include no-tools baseline; report "Sandbox Delta" vs tool-using agents |
+| `--dspy-optimized-on-test` | Run DSPy optimized on 30% held-out test set (70/30 split) |
+| `--no-pydantic` | Skip PydanticAI agent |
+| `--no-dspy` | Skip DSPy vanilla |
+| `--no-optimized` | Skip DSPy optimized |
 
 ### Dataset categories
 
@@ -100,7 +119,12 @@ uv run python -m benchmark.run
 
 ### Output
 
-Results are saved to `benchmark/results/benchmark_YYYYMMDD_HHMMSS.json` with per-question details and aggregate metrics (accuracy, latency, sandbox calls per category).
+Results are saved to `benchmark/results/benchmark_YYYYMMDD_HHMMSS.json` with per-question details and aggregate metrics:
+
+- **Accuracy** and **Sandbox Delta** (vs no-tools baseline when `--direct` is used)
+- **Latency** (mean, median, P95)
+- **Sandbox calls** per question
+- **Token economics**: prompt tokens, completion tokens, total tokens, estimated cost (USD)
 
 ## Monty sandbox
 

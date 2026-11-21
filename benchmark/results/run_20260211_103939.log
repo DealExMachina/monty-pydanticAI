@@ -1,0 +1,372 @@
+Loaded 100 financial calculation examples.
+
+
+[1m================================================================
+  Agent A: PydanticAI + Monty
+================================================================[0m
+
+  [  1/100] option_pricing       Calculate the Black-Scholes price of a European ca...  ✓  got=11.9051  exp=11.9051  t=9.2s  calls=1
+  [  2/100] option_pricing       Calculate the Black-Scholes price of a European pu...  ✗  got=None  exp=2.6500  t=362.7s  calls=4
+  [  3/100] option_pricing       Calculate the Black-Scholes price of a European ca...  ✓  got=55.78136998461379  exp=55.7814  t=3.8s  calls=1
+  [  4/100] option_pricing       Calculate the Black-Scholes price of a European ca...  ✓  got=0.17065215582146998  exp=0.1707  t=24.6s  calls=1
+  [  5/100] option_pricing       Calculate the Black-Scholes price of a European pu...  ✓  got=28.436682847248  exp=28.4367  t=6.9s  calls=1
+  [  6/100] option_pricing       Calculate the Black-Scholes price of a European ca...  ✓  got=7.4214  exp=7.4214  t=7.0s  calls=3
+  [  7/100] option_pricing       Calculate the Black-Scholes price of a European pu...  ✗  got=None  exp=2.8853  t=10.7s  calls=1
+  [  8/100] option_pricing       Calculate the Black-Scholes price of a European ca...  ✗  got=None  exp=8.1196  t=5.0s  calls=0
+  [  9/100] option_pricing       Calculate the Black-Scholes price of a European pu...  ✗  got=None  exp=10.7911  t=4.1s  calls=0
+  [ 10/100] option_pricing       Calculate the Black-Scholes price of a European ca...  ✓  got=25.7798  exp=25.7798  t=3.4s  calls=1
+  [ 11/100] greeks               Calculate the delta of a European call option with...  ✗  got=None  exp=0.6701  t=4.9s  calls=0
+  [ 12/100] greeks               Calculate the delta of a European put option with ...  ✗  got=None  exp=-0.6767  t=46.4s  calls=2
+  [ 13/100] greeks               Calculate the gamma of a European option with S=10...  ✗  got=None  exp=0.0188  t=6.1s  calls=0
+  [ 14/100] greeks               Calculate the vega (per 1% change in volatility) o...  ✗  got=None  exp=0.3752  t=16.9s  calls=0
+  [ 15/100] greeks               Calculate the theta (per year) of a European call ...  ✓  got=-6.507599093795585  exp=-6.5076  t=39.7s  calls=1
+  [ 16/100] greeks               Calculate the rho of a European call option with S...  ✓  got=55.1039  exp=55.1039  t=11.1s  calls=2
+  [ 17/100] greeks               Calculate the gamma of a European option with S=50...  ✗  got=None  exp=0.0303  t=10.9s  calls=1
+  [ 18/100] greeks               Calculate the delta of a European call option with...  ✗  got=None  exp=0.9935  t=4.6s  calls=0
+  [ 19/100] greeks               Calculate the vega (per 1% change in volatility) o...  ✗  got=0.680357182227155  exp=0.5521  t=47.9s  calls=1
+  [ 20/100] greeks               Calculate the theta (per year) of a European put o...  ✗  got=None  exp=-5.0270  t=19.3s  calls=0
+  [ 21/100] var_portfolio        Calculate the 1-day 95% parametric VaR for a portf...  ✗  got=32900.0  exp=2072.3208  t=3.9s  calls=1
+  [ 22/100] var_portfolio        Calculate the 10-day 99% parametric VaR for a port...  ✗  got=None  exp=34756.4692  t=10.4s  calls=0
+  [ 23/100] var_portfolio        Calculate the 1-day 95% parametric VaR for a $2,00...  ✗  got=68381.36588281927  exp=4307.2379  t=14.2s  calls=1
+  [ 24/100] var_portfolio        Calculate the 5-day 99% parametric VaR for a $10,0...  ✗  got=609262.6999086684  exp=38319.7844  t=29.4s  calls=2
+  [ 25/100] var_portfolio        Calculate the 1-day 95% parametric VaR for a $3,00...  ✗  got=None  exp=4895.3977  t=10.8s  calls=1
+  [ 26/100] var_portfolio        Calculate the 1-day 95% parametric VaR for a $4,00...  ✗  got=None  exp=5890.6424  t=3.9s  calls=0
+  [ 27/100] var_portfolio        Calculate the 20-day 99% parametric VaR for a port...  ✗  got=156056.15957002316  exp=9830.6140  t=27.6s  calls=3
+  [ 28/100] var_portfolio        Calculate the 1-day 95% parametric VaR for a $1,50...  ✗  got=None  exp=3574.7533  t=14.3s  calls=0
+  [ 29/100] var_portfolio        Calculate the 1-day 99% parametric VaR for an $8,0...  ✗  got=252757.4556318115  exp=15922.2231  t=41.8s  calls=2
+  [ 30/100] var_portfolio        Calculate the 1-day 95% parametric VaR for a portf...  ✗  got=987000.0  exp=62169.6234  t=8.8s  calls=1
+  [ 31/100] bond_pricing         Calculate the price of a 10-year bond with face va...  ✗  got=None  exp=1000.0000  t=3.9s  calls=0
+  [ 32/100] bond_pricing         Calculate the price of a 10-year bond with face va...  ✓  got=1162.22  exp=1162.2179  t=8.0s  calls=3
+  [ 33/100] bond_pricing         Calculate the price of a 5-year bond with face val...  ✓  got=873.63  exp=873.6291  t=6.5s  calls=3
+  [ 34/100] bond_pricing         Calculate the price of a 10-year zero-coupon bond ...  ✓  got=613.9133  exp=613.9133  t=5.5s  calls=3
+  [ 35/100] bond_pricing         Calculate the Macaulay duration of a 10-year bond ...  ✗  got=None  exp=8.1078  t=5.5s  calls=0
+  [ 36/100] bond_pricing         Calculate the Macaulay duration of a 20-year bond ...  ✗  got=None  exp=11.9472  t=10.6s  calls=1
+  [ 37/100] bond_pricing         Calculate the convexity of a 10-year bond with fac...  ✗  got=None  exp=74.9977  t=10.3s  calls=0
+  [ 38/100] bond_pricing         Calculate the price of a 3-year bond with face val...  ✓  got=1028.2861135489468  exp=1028.2861  t=4.4s  calls=1
+  [ 39/100] bond_pricing         Calculate the price of a 30-year bond with face va...  ✓  got=1137.6483115148942  exp=1137.6483  t=9.5s  calls=1
+  [ 40/100] bond_pricing         Calculate the Macaulay duration of a 10-year zero-...  ✗  got=None  exp=10.0000  t=3.6s  calls=0
+  [ 41/100] compound_interest    Calculate the future value of $10,000 invested at ...  ✓  got=16288.95  exp=16288.9463  t=3.8s  calls=3
+  [ 42/100] compound_interest    Calculate the future value of $5,000 invested at 6...  ✓  got=6744.25  exp=6744.2508  t=3.1s  calls=2
+  [ 43/100] compound_interest    Calculate the future value of $25,000 invested at ...  ✓  got=45417.4175  exp=45417.4175  t=7.3s  calls=3
+  [ 44/100] compound_interest    Calculate the future value of $10,000 invested at ...  ✓  got=22255.409284924677  exp=22255.4093  t=6.5s  calls=1
+  [ 45/100] compound_interest    Calculate the future value of $1,000 invested at 3...  ✓  got=1822.073874451072  exp=1822.0739  t=8.0s  calls=1
+  [ 46/100] compound_interest    Calculate the future value of $50,000 invested at ...  ✓  got=86699.30199142423  exp=86699.3020  t=4.3s  calls=1
+  [ 47/100] compound_interest    Calculate the future value of $100,000 invested at...  ✓  got=448168.91  exp=448168.9070  t=5.4s  calls=3
+  [ 48/100] compound_interest    Calculate the future value of $20,000 invested at ...  ✓  got=22536.500602639397  exp=22536.5006  t=3.3s  calls=1
+  [ 49/100] compound_interest    Calculate the future value of $15,000 invested at ...  ✓  got=66480.68  exp=66480.6847  t=4.1s  calls=3
+  [ 50/100] compound_interest    Calculate the future value of $75,000 invested at ...  ✓  got=78845.3322282018  exp=78845.3322  t=4.3s  calls=1
+  [ 51/100] loan_amortization    Calculate the monthly payment for a $300,000 mortg...  ✓  got=1798.65  exp=1798.6516  t=11.5s  calls=3
+  [ 52/100] loan_amortization    Calculate the monthly payment for a $25,000 car lo...  ✓  got=471.78084110027197  exp=471.7808  t=3.1s  calls=1
+  [ 53/100] loan_amortization    Calculate the total interest paid on a $250,000 mo...  ✓  got=206016.78  exp=206016.7788  t=5.3s  calls=1
+  [ 54/100] loan_amortization    Calculate the remaining balance on a $200,000 mort...  ✗  got=None  exp=183657.4642  t=4.4s  calls=0
+  [ 55/100] loan_amortization    Calculate the monthly payment for a $10,000 person...  ✓  got=313.36  exp=313.3637  t=4.3s  calls=3
+  [ 56/100] loan_amortization    Calculate the remaining balance on a $400,000 mort...  ✓  got=315135.84  exp=315135.8368  t=18.4s  calls=2
+  [ 57/100] loan_amortization    Calculate the total interest paid on a $35,000 car...  ✗  got=None  exp=7963.4963  t=3.6s  calls=0
+  [ 58/100] loan_amortization    Calculate the monthly payment for a $350,000 mortg...  ✓  got=2502.09  exp=2502.0889  t=5.3s  calls=3
+  [ 59/100] loan_amortization    Calculate the remaining balance on a $20,000 car l...  ✗  got=None  exp=8724.0683  t=6.5s  calls=0
+  [ 60/100] loan_amortization    Calculate the total interest paid on a $500,000 mo...  ✓  got=235375.1091590242  exp=235375.1092  t=5.7s  calls=1
+  [ 61/100] npv_irr              Calculate the NPV of a project at a 10.0% discount...  ✓  got=16986.5446  exp=16986.5446  t=10.5s  calls=2
+  [ 62/100] npv_irr              Calculate the NPV of a project at a 8.0% discount ...  ✗  got=None  exp=39562.6022  t=4.5s  calls=1
+  [ 63/100] npv_irr              Calculate the NPV of a project at a 15.0% discount...  ✗  got=None  exp=-174076.1641  t=7.6s  calls=1
+  [ 64/100] npv_irr              Calculate the NPV of a project at a 12.0% discount...  ✓  got=50035.84467223472  exp=50035.8447  t=2.8s  calls=1
+  [ 65/100] npv_irr              Calculate the NPV of a project at a 5.0% discount ...  ✓  got=1020.4081632653033  exp=1020.4082  t=9.2s  calls=1
+  [ 66/100] npv_irr              Calculate the NPV of a project at a 3.0% discount ...  ✗  got=1279530.4255163742  exp=279530.4255  t=5.4s  calls=2
+  [ 67/100] npv_irr              Calculate the NPV of a project at a 10.0% discount...  ✓  got=16973.46  exp=16973.4630  t=4.9s  calls=3
+  [ 68/100] npv_irr              Calculate the NPV of a project at a 7.0% discount ...  ✓  got=-223.6003144379465  exp=-223.6003  t=2.8s  calls=1
+  [ 69/100] npv_irr              Calculate the NPV of a project at a 9.0% discount ...  ✗  got=None  exp=70234.8001  t=2.5s  calls=0
+  [ 70/100] npv_irr              Calculate the NPV of a project at a 20.0% discount...  ✓  got=-2337.9629629629617  exp=-2337.9630  t=27.9s  calls=4
+  [ 71/100] portfolio_metrics    Calculate the weighted portfolio return for two as...  ✗  got=10.4  exp=0.1040  t=3.8s  calls=1
+  [ 72/100] portfolio_metrics    Calculate the weighted portfolio return for three ...  ✗  got=10.1  exp=0.1010  t=12.2s  calls=1
+  [ 73/100] portfolio_metrics    Calculate the portfolio variance for two assets wi...  ✓  got=0.036000000000000004  exp=0.0360  t=4.5s  calls=1
+  [ 74/100] portfolio_metrics    Calculate the portfolio standard deviation for two...  ✓  got=0.1695582495781317  exp=0.1696  t=11.1s  calls=2
+  [ 75/100] portfolio_metrics    Calculate the Sharpe ratio for a portfolio with re...  ✓  got=0.6111111111111112  exp=0.6111  t=6.5s  calls=1
+  [ 76/100] portfolio_metrics    Calculate the Sharpe ratio for a portfolio with re...  ✓  got=0.5833333333333333  exp=0.5833  t=3.4s  calls=1
+  [ 77/100] portfolio_metrics    Calculate the portfolio variance for three assets ...  ✗  got=None  exp=0.0269  t=4.5s  calls=0
+  [ 78/100] portfolio_metrics    Calculate the information ratio for a portfolio wi...  ✓  got=0.4  exp=0.4000  t=7.7s  calls=1
+  [ 79/100] portfolio_metrics    Calculate the Sortino ratio for a portfolio with r...  ✓  got=1.2  exp=1.2000  t=3.0s  calls=0
+  [ 80/100] portfolio_metrics    Calculate the weighted portfolio return for four e...  ✗  got=9.0  exp=0.0900  t=9.4s  calls=1
+  [ 81/100] derivatives_misc     Using put-call parity, find the call price given: ...  ✗  got=None  exp=10.4471  t=3.2s  calls=0
+  [ 82/100] derivatives_misc     Using put-call parity, find the put price given: S...  ✗  got=None  exp=5.2209  t=2.8s  calls=0
+  [ 83/100] derivatives_misc     Calculate the forward price of an asset with spot ...  ✓  got=53.09182732726798  exp=53.0918  t=3.3s  calls=1
+  [ 84/100] derivatives_misc     Calculate the forward price of an asset with spot ...  ✓  got=101.51130646157189  exp=101.5113  t=4.6s  calls=1
+  [ 85/100] derivatives_misc     Calculate the forward price of an asset with spot ...  ✓  got=212.3673093090719  exp=212.3673  t=3.0s  calls=1
+  [ 86/100] derivatives_misc     Calculate the profit of a covered call strategy wh...  ✓  got=5.0  exp=5.0000  t=3.1s  calls=1
+  [ 87/100] derivatives_misc     Calculate the profit of a covered call strategy wh...  ✓  got=0.0  exp=0.0000  t=2.7s  calls=0
+  [ 88/100] derivatives_misc     Calculate the profit of a protective put strategy ...  ✓  got=-9.0  exp=-9.0000  t=4.7s  calls=0
+  [ 89/100] derivatives_misc     Calculate the profit of a protective put strategy ...  ✓  got=16.0  exp=16.0000  t=4.7s  calls=0
+  [ 90/100] derivatives_misc     Calculate the forward price of an asset with spot ...  ✓  got=156.9042  exp=156.9042  t=5.4s  calls=3
+  [ 91/100] depreciation_tax     Calculate the annual straight-line depreciation fo...  ✓  got=9000.0  exp=9000.0000  t=1.3s  calls=0
+  [ 92/100] depreciation_tax     Calculate the annual straight-line depreciation fo...  ✓  got=9000.0  exp=9000.0000  t=1.6s  calls=0
+  [ 93/100] depreciation_tax     Calculate the declining balance depreciation for y...  ✓  got=16000.0  exp=16000.0000  t=1.7s  calls=0
+  [ 94/100] depreciation_tax     Calculate the declining balance depreciation for y...  ✓  got=10240.000000000002  exp=10240.0000  t=7.7s  calls=1
+  [ 95/100] depreciation_tax     Calculate the after-tax cash flow given revenue of...  ✓  got=144500.0  exp=144500.0000  t=13.9s  calls=1
+  [ 96/100] depreciation_tax     Calculate the after-tax cash flow given revenue of...  ✓  got=339000.0  exp=339000.0000  t=8.3s  calls=1
+  [ 97/100] depreciation_tax     Calculate the tax shield from an interest expense ...  ✓  got=15000.0  exp=15000.0000  t=1.0s  calls=0
+  [ 98/100] depreciation_tax     Calculate the tax shield from an interest expense ...  ✓  got=30000.0  exp=30000.0000  t=1.4s  calls=0
+  [ 99/100] depreciation_tax     Calculate the effective tax rate if a company paid...  ✓  got=0.25  exp=0.2500  t=3.4s  calls=0
+  [100/100] depreciation_tax     Calculate the book value after 5 years for an asse...  ✓  got=28476.5625  exp=28476.5625  t=3.7s  calls=1
+
+  [1mAccuracy: 60.0%[0m
+
+[1m================================================================
+  Agent B: DSPy ReAct (vanilla)
+================================================================[0m
+
+  [  1/100] option_pricing       Calculate the Black-Scholes price of a European ca...  ✓  got=11.9051  exp=11.9051  t=24.4s  calls=2
+  [  2/100] option_pricing       Calculate the Black-Scholes price of a European pu...  ✓  got=2.65  exp=2.6500  t=27.6s  calls=2
+  [  3/100] option_pricing       Calculate the Black-Scholes price of a European ca...  ✓  got=55.7814  exp=55.7814  t=32.3s  calls=2
+  [  4/100] option_pricing       Calculate the Black-Scholes price of a European ca...  ✓  got=0.1831  exp=0.1707  t=98.7s  calls=3
+  [  5/100] option_pricing       Calculate the Black-Scholes price of a European pu...  ✓  got=28.4367  exp=28.4367  t=23.7s  calls=1
+  [  6/100] option_pricing       Calculate the Black-Scholes price of a European ca...  ✓  got=7.4214  exp=7.4214  t=22.3s  calls=1
+  [  7/100] option_pricing       Calculate the Black-Scholes price of a European pu...  ✓  got=2.8853  exp=2.8853  t=30.5s  calls=3
+  [  8/100] option_pricing       Calculate the Black-Scholes price of a European ca...  ✓  got=8.1196  exp=8.1196  t=24.7s  calls=2
+  [  9/100] option_pricing       Calculate the Black-Scholes price of a European pu...  ✓  got=10.7911  exp=10.7911  t=70.3s  calls=5
+  [ 10/100] option_pricing       Calculate the Black-Scholes price of a European ca...  ✓  got=25.7798  exp=25.7798  t=77.6s  calls=4
+  [ 11/100] greeks               Calculate the delta of a European call option with...  ✓  got=0.6701  exp=0.6701  t=31.9s  calls=2
+  [ 12/100] greeks               Calculate the delta of a European put option with ...-0.732408
+  ✗  got=-0.732408379019135  exp=-0.6767  t=36.4s  calls=3
+  [ 13/100] greeks               Calculate the gamma of a European option with S=10...0.017847
+  ✓  got=0.017846982962362357  exp=0.0188  t=56.6s  calls=4
+  [ 14/100] greeks               Calculate the vega (per 1% change in volatility) o...  ✓  got=0.3752403469  exp=0.3752  t=42.8s  calls=2
+  [ 15/100] greeks               Calculate the theta (per year) of a European call ...-6.5076
+  ✗  got=-6.4124  exp=-6.5076  t=70.1s  calls=4
+  [ 16/100] greeks               Calculate the rho of a European call option with S...  ✓  got=55.1039  exp=55.1039  t=31.9s  calls=2
+  [ 17/100] greeks               Calculate the gamma of a European option with S=50...  ✓  got=0.029669428137504728  exp=0.0303  t=32.6s  calls=2
+  [ 18/100] greeks               Calculate the delta of a European call option with...0.993471
+  ✓  got=0.993471191168013  exp=0.9935  t=35.5s  calls=3
+  [ 19/100] greeks               Calculate the vega (per 1% change in volatility) o...  ✓  got=0.5520605743869496  exp=0.5521  t=28.6s  calls=2
+  [ 20/100] greeks               Calculate the theta (per year) of a European put o...  ✗  got=-9.903531590893024  exp=-5.0270  t=42.5s  calls=3
+  [ 21/100] var_portfolio        Calculate the 1-day 95% parametric VaR for a portf...32900.0
+  ✗  got=32900.0  exp=2072.3208  t=45.5s  calls=2
+  [ 22/100] var_portfolio        Calculate the 10-day 99% parametric VaR for a port...552608.02
+  ✗  got=552608.0211144243  exp=34756.4692  t=42.3s  calls=2
+  [ 23/100] var_portfolio        Calculate the 1-day 95% parametric VaR for a $2,00...  ✗  got=68381.36588281927  exp=4307.2379  t=47.8s  calls=2
+  [ 24/100] var_portfolio        Calculate the 5-day 99% parametric VaR for a $10,0...  ✗  got=608295.2012006588  exp=38319.7844  t=24.6s  calls=1
+  [ 25/100] var_portfolio        Calculate the 1-day 95% parametric VaR for a $3,00...77718.94
+  ✗  got=77716.38  exp=4895.3977  t=24.6s  calls=1
+  [ 26/100] var_portfolio        Calculate the 1-day 95% parametric VaR for a $4,00...  ✗  got=93519.37125537147  exp=5890.6424  t=15.8s  calls=1
+  [ 27/100] var_portfolio        Calculate the 20-day 99% parametric VaR for a port...156301.15
+  ✗  got=301.0  exp=9830.6140  t=29.6s  calls=1
+  [ 28/100] var_portfolio        Calculate the 1-day 95% parametric VaR for a $1,50...  ✗  got=56752.5  exp=3574.7533  t=24.4s  calls=1
+  [ 29/100] var_portfolio        Calculate the 1-day 99% parametric VaR for an $8,0...252757.46
+  ✗  got=252757.45563624878  exp=15922.2231  t=31.6s  calls=2
+  [ 30/100] var_portfolio        Calculate the 1-day 95% parametric VaR for a portf...  ✗  got=986912.1761708837  exp=62169.6234  t=16.1s  calls=1
+  [ 31/100] bond_pricing         Calculate the price of a 10-year bond with face va...  ✓  got=1000.0  exp=1000.0000  t=20.6s  calls=2
+  [ 32/100] bond_pricing         Calculate the price of a 10-year bond with face va...  ✓  got=1162.2179155871008  exp=1162.2179  t=12.5s  calls=1
+  [ 33/100] bond_pricing         Calculate the price of a 5-year bond with face val...  ✓  got=873.6290864330284  exp=873.6291  t=11.9s  calls=1
+  [ 34/100] bond_pricing         Calculate the price of a 10-year zero-coupon bond ...  ✓  got=613.9132535407593  exp=613.9133  t=10.5s  calls=1
+  [ 35/100] bond_pricing         Calculate the Macaulay duration of a 10-year bond ...8.107822
+  ✓  got=8.107821675644052  exp=8.1078  t=45.9s  calls=5
+  [ 36/100] bond_pricing         Calculate the Macaulay duration of a 20-year bond ...11.9472
+  ✗  got=12.3862  exp=11.9472  t=41.9s  calls=2
+  [ 37/100] bond_pricing         Calculate the convexity of a 10-year bond with fac...  ✓  got=74.9976815328175  exp=74.9977  t=42.7s  calls=4
+  [ 38/100] bond_pricing         Calculate the price of a 3-year bond with face val...  ✓  got=1028.29  exp=1028.2861  t=7.6s  calls=1
+  [ 39/100] bond_pricing         Calculate the price of a 30-year bond with face va...  ✓  got=1137.6483115148942  exp=1137.6483  t=15.4s  calls=1
+  [ 40/100] bond_pricing         Calculate the Macaulay duration of a 10-year zero-...  ✓  got=10.0  exp=10.0000  t=11.7s  calls=1
+  [ 41/100] compound_interest    Calculate the future value of $10,000 invested at ...  ✓  got=16288.946267774416  exp=16288.9463  t=13.8s  calls=1
+  [ 42/100] compound_interest    Calculate the future value of $5,000 invested at 6...  ✓  got=6744.250762746518  exp=6744.2508  t=9.8s  calls=1
+  [ 43/100] compound_interest    Calculate the future value of $25,000 invested at ...  ✓  got=45417.42  exp=45417.4175  t=10.4s  calls=1
+  [ 44/100] compound_interest    Calculate the future value of $10,000 invested at ...  ✓  got=22255.409284924677  exp=22255.4093  t=15.2s  calls=1
+  [ 45/100] compound_interest    Calculate the future value of $1,000 invested at 3...  ✓  got=1822.073874451072  exp=1822.0739  t=10.2s  calls=1
+  [ 46/100] compound_interest    Calculate the future value of $50,000 invested at ...86699.3
+  ✓  got=86699.3  exp=86699.3020  t=25.4s  calls=2
+  [ 47/100] compound_interest    Calculate the future value of $100,000 invested at...  ✓  got=448168.91  exp=448168.9070  t=11.8s  calls=1
+  [ 48/100] compound_interest    Calculate the future value of $20,000 invested at ...  ✓  got=22536.5  exp=22536.5006  t=17.6s  calls=1
+  [ 49/100] compound_interest    Calculate the future value of $15,000 invested at ...66480.68
+  ✗  got=66744.23  exp=66480.6847  t=19.2s  calls=1
+  [ 50/100] compound_interest    Calculate the future value of $75,000 invested at ...  ✓  got=78845.3322282018  exp=78845.3322  t=12.2s  calls=1
+  [ 51/100] loan_amortization    Calculate the monthly payment for a $300,000 mortg...  ✓  got=1798.65  exp=1798.6516  t=16.8s  calls=1
+  [ 52/100] loan_amortization    Calculate the monthly payment for a $25,000 car lo...  ✓  got=471.78  exp=471.7808  t=10.7s  calls=1
+  [ 53/100] loan_amortization    Calculate the total interest paid on a $250,000 mo...  ✓  got=206016.78  exp=206016.7788  t=16.5s  calls=1
+  [ 54/100] loan_amortization    Calculate the remaining balance on a $200,000 mort...  ✓  got=183657.4641700639  exp=183657.4642  t=11.8s  calls=1
+  [ 55/100] loan_amortization    Calculate the monthly payment for a $10,000 person...  ✓  got=313.36  exp=313.3637  t=10.3s  calls=1
+  [ 56/100] loan_amortization    Calculate the remaining balance on a $400,000 mort...  ✓  got=315135.836846326  exp=315135.8368  t=18.8s  calls=1
+  [ 57/100] loan_amortization    Calculate the total interest paid on a $35,000 car...  ✓  got=7963.5  exp=7963.4963  t=18.4s  calls=2
+  [ 58/100] loan_amortization    Calculate the monthly payment for a $350,000 mortg...  ✓  got=2502.09  exp=2502.0889  t=10.4s  calls=1
+  [ 59/100] loan_amortization    Calculate the remaining balance on a $20,000 car l...  ✗  got=12709.776660486568  exp=8724.0683  t=13.0s  calls=1
+  [ 60/100] loan_amortization    Calculate the total interest paid on a $500,000 mo...  ✓  got=235375.11  exp=235375.1092  t=10.9s  calls=1
+  [ 61/100] npv_irr              Calculate the NPV of a project at a 10.0% discount...  ✓  got=16986.544634929283  exp=16986.5446  t=10.4s  calls=1
+  [ 62/100] npv_irr              Calculate the NPV of a project at a 8.0% discount ...  ✓  got=39562.60222468522  exp=39562.6022  t=13.3s  calls=1
+  [ 63/100] npv_irr              Calculate the NPV of a project at a 15.0% discount...  ✓  got=-174076.1640577576  exp=-174076.1641  t=16.7s  calls=1
+  [ 64/100] npv_irr              Calculate the NPV of a project at a 12.0% discount...  ✓  got=50035.84467223472  exp=50035.8447  t=21.6s  calls=1
+  [ 65/100] npv_irr              Calculate the NPV of a project at a 5.0% discount ...  ✓  got=1020.4081632653033  exp=1020.4082  t=12.7s  calls=1
+  [ 66/100] npv_irr              Calculate the NPV of a project at a 3.0% discount ...  ✓  got=279530.4255163745  exp=279530.4255  t=11.8s  calls=1
+  [ 67/100] npv_irr              Calculate the NPV of a project at a 10.0% discount...16973.46
+  ✓  got=16973.46295160028  exp=16973.4630  t=18.9s  calls=2
+  [ 68/100] npv_irr              Calculate the NPV of a project at a 7.0% discount ...  ✓  got=-223.6003144379465  exp=-223.6003  t=10.6s  calls=1
+  [ 69/100] npv_irr              Calculate the NPV of a project at a 9.0% discount ...  ✓  got=70234.8  exp=70234.8001  t=12.6s  calls=1
+  [ 70/100] npv_irr              Calculate the NPV of a project at a 20.0% discount...  ✓  got=-2337.9629629629635  exp=-2337.9630  t=13.2s  calls=1
+  [ 71/100] portfolio_metrics    Calculate the weighted portfolio return for two as...  ✓  got=0.104  exp=0.1040  t=18.1s  calls=1
+  [ 72/100] portfolio_metrics    Calculate the weighted portfolio return for three ...  ✗  got=10.100000000000001  exp=0.1010  t=9.9s  calls=1
+  [ 73/100] portfolio_metrics    Calculate the portfolio variance for two assets wi...  ✓  got=0.036000000000000004  exp=0.0360  t=15.0s  calls=1
+  [ 74/100] portfolio_metrics    Calculate the portfolio standard deviation for two...  ✓  got=0.1695582495781317  exp=0.1696  t=14.8s  calls=1
+  [ 75/100] portfolio_metrics    Calculate the Sharpe ratio for a portfolio with re...  ✓  got=0.6111111111111112  exp=0.6111  t=10.4s  calls=1
+  [ 76/100] portfolio_metrics    Calculate the Sharpe ratio for a portfolio with re...0.583333
+  ✓  got=0.583333  exp=0.5833  t=20.9s  calls=1
+  [ 77/100] portfolio_metrics    Calculate the portfolio variance for three assets ...  ✓  got=0.026919  exp=0.0269  t=18.4s  calls=1
+  [ 78/100] portfolio_metrics    Calculate the information ratio for a portfolio wi...  ✓  got=0.4000000000000001  exp=0.4000  t=11.5s  calls=1
+  [ 79/100] portfolio_metrics    Calculate the Sortino ratio for a portfolio with r...  ✓  got=1.2  exp=1.2000  t=12.1s  calls=1
+  [ 80/100] portfolio_metrics    Calculate the weighted portfolio return for four e...  ✓  got=0.09  exp=0.0900  t=12.1s  calls=1
+  [ 81/100] derivatives_misc     Using put-call parity, find the call price given: ...  ✓  got=10.4471  exp=10.4471  t=15.4s  calls=1
+  [ 82/100] derivatives_misc     Using put-call parity, find the put price given: S...  ✓  got=5.220860697209304  exp=5.2209  t=19.9s  calls=1
+  [ 83/100] derivatives_misc     Calculate the forward price of an asset with spot ...  ✓  got=53.09182732726798  exp=53.0918  t=19.9s  calls=1
+  [ 84/100] derivatives_misc     Calculate the forward price of an asset with spot ...  ✓  got=101.5113  exp=101.5113  t=13.7s  calls=1
+  [ 85/100] derivatives_misc     Calculate the forward price of an asset with spot ...  ✓  got=212.3673093090719  exp=212.3673  t=9.5s  calls=1
+  [ 86/100] derivatives_misc     Calculate the profit of a covered call strategy wh...  ✓  got=5.0  exp=5.0000  t=10.8s  calls=1
+  [ 87/100] derivatives_misc     Calculate the profit of a covered call strategy wh...  ✓  got=0.0  exp=0.0000  t=9.0s  calls=1
+  [ 88/100] derivatives_misc     Calculate the profit of a protective put strategy ...  ✓  got=-9.0  exp=-9.0000  t=17.0s  calls=1
+  [ 89/100] derivatives_misc     Calculate the profit of a protective put strategy ...  ✓  got=16.0  exp=16.0000  t=7.4s  calls=0
+  [ 90/100] derivatives_misc     Calculate the forward price of an asset with spot ...  ✓  got=156.9042  exp=156.9042  t=24.6s  calls=2
+  [ 91/100] depreciation_tax     Calculate the annual straight-line depreciation fo...  ✓  got=9000.0  exp=9000.0000  t=11.1s  calls=1
+  [ 92/100] depreciation_tax     Calculate the annual straight-line depreciation fo...  ✓  got=9000.0  exp=9000.0000  t=10.8s  calls=1
+  [ 93/100] depreciation_tax     Calculate the declining balance depreciation for y...  ✓  got=16000.0  exp=16000.0000  t=14.1s  calls=1
+  [ 94/100] depreciation_tax     Calculate the declining balance depreciation for y...10240.0
+  ✓  got=10240.000000000002  exp=10240.0000  t=29.9s  calls=2
+  [ 95/100] depreciation_tax     Calculate the after-tax cash flow given revenue of...  ✓  got=144500.0  exp=144500.0000  t=51.7s  calls=2
+  [ 96/100] depreciation_tax     Calculate the after-tax cash flow given revenue of...  ✗  got=0.0  exp=339000.0000  t=42.4s  calls=3
+  [ 97/100] depreciation_tax     Calculate the tax shield from an interest expense ...  ✓  got=15000.0  exp=15000.0000  t=17.9s  calls=2
+  [ 98/100] depreciation_tax     Calculate the tax shield from an interest expense ...  ✓  got=30000.0  exp=30000.0000  t=9.0s  calls=1
+  [ 99/100] depreciation_tax     Calculate the effective tax rate if a company paid...  ✗  got=25.0  exp=0.2500  t=4.2s  calls=0
+  [100/100] depreciation_tax     Calculate the book value after 5 years for an asse...  ✓  got=28476.5625  exp=28476.5625  t=11.3s  calls=1
+
+  [1mAccuracy: 81.0%[0m
+
+[1m================================================================
+  Agent C: DSPy ReAct (optimized)
+================================================================[0m
+
+  [  1/100] option_pricing       Calculate the Black-Scholes price of a European ca...  ✗  got=10.5  exp=11.9051  t=25.5s  calls=0
+  [  2/100] option_pricing       Calculate the Black-Scholes price of a European pu...  ✓  got=2.65  exp=2.6500  t=20.5s  calls=0
+  [  3/100] option_pricing       Calculate the Black-Scholes price of a European ca...  ✓  got=55.7814  exp=55.7814  t=14.0s  calls=0
+  [  4/100] option_pricing       Calculate the Black-Scholes price of a European ca...  ✓  got=0.1707  exp=0.1707  t=18.5s  calls=0
+  [  5/100] option_pricing       Calculate the Black-Scholes price of a European pu...  ✓  got=28.4367  exp=28.4367  t=42.7s  calls=0
+  [  6/100] option_pricing       Calculate the Black-Scholes price of a European ca...  ✓  got=7.4214  exp=7.4214  t=26.6s  calls=0
+  [  7/100] option_pricing       Calculate the Black-Scholes price of a European pu...  ✓  got=2.9009  exp=2.8853  t=62.5s  calls=0
+  [  8/100] option_pricing       Calculate the Black-Scholes price of a European ca...  ✓  got=8.1196  exp=8.1196  t=25.3s  calls=0
+  [  9/100] option_pricing       Calculate the Black-Scholes price of a European pu...  ✗  got=9.9497  exp=10.7911  t=39.4s  calls=0
+  [ 10/100] option_pricing       Calculate the Black-Scholes price of a European ca...  ✓  got=25.7798  exp=25.7798  t=19.2s  calls=0
+  [ 11/100] greeks               Calculate the delta of a European call option with...  ✓  got=0.6701  exp=0.6701  t=46.9s  calls=0
+  [ 12/100] greeks               Calculate the delta of a European put option with ...  ✗  got=-0.6666  exp=-0.6767  t=19.2s  calls=0
+  [ 13/100] greeks               Calculate the gamma of a European option with S=10...  ✓  got=0.017847  exp=0.0188  t=21.9s  calls=0
+  [ 14/100] greeks               Calculate the vega (per 1% change in volatility) o...  ✓  got=0.3753  exp=0.3752  t=29.6s  calls=0
+  [ 15/100] greeks               Calculate the theta (per year) of a European call ...  ✓  got=-6.5076  exp=-6.5076  t=23.9s  calls=0
+  [ 16/100] greeks               Calculate the rho of a European call option with S...  ✓  got=55.1039  exp=55.1039  t=33.7s  calls=0
+  [ 17/100] greeks               Calculate the gamma of a European option with S=50...  ✓  got=0.02968  exp=0.0303  t=34.9s  calls=0
+  [ 18/100] greeks               Calculate the delta of a European call option with...  ✓  got=0.9935  exp=0.9935  t=16.5s  calls=0
+  [ 19/100] greeks               Calculate the vega (per 1% change in volatility) o...  ✓  got=0.5521  exp=0.5521  t=25.0s  calls=0
+  [ 20/100] greeks               Calculate the theta (per year) of a European put o...  ✗  got=-11.0499  exp=-5.0270  t=28.8s  calls=0
+  [ 21/100] var_portfolio        Calculate the 1-day 95% parametric VaR for a portf...  ✗  got=32900.0  exp=2072.3208  t=9.1s  calls=0
+  [ 22/100] var_portfolio        Calculate the 10-day 99% parametric VaR for a port...  ✗  got=551720.0  exp=34756.4692  t=7.9s  calls=0
+  [ 23/100] var_portfolio        Calculate the 1-day 95% parametric VaR for a $2,00...  ✗  got=68381.33  exp=4307.2379  t=52.0s  calls=0
+  [ 24/100] var_portfolio        Calculate the 5-day 99% parametric VaR for a $10,0...  ✗  got=607784.0  exp=38319.7844  t=15.6s  calls=0
+  [ 25/100] var_portfolio        Calculate the 1-day 95% parametric VaR for a $3,00...  ✗  got=77716.0  exp=4895.3977  t=12.0s  calls=0
+  [ 26/100] var_portfolio        Calculate the 1-day 95% parametric VaR for a $4,00...  ✗  got=540.0  exp=5890.6424  t=14.9s  calls=0
+  [ 27/100] var_portfolio        Calculate the 20-day 99% parametric VaR for a port...  ✗  got=156304.0  exp=9830.6140  t=13.2s  calls=0
+  [ 28/100] var_portfolio        Calculate the 1-day 95% parametric VaR for a $1,50...  ✗  got=56752.5  exp=3574.7533  t=18.0s  calls=0
+  [ 29/100] var_portfolio        Calculate the 1-day 99% parametric VaR for an $8,0...  ✗  got=253154.26  exp=15922.2231  t=14.3s  calls=0
+  [ 30/100] var_portfolio        Calculate the 1-day 95% parametric VaR for a portf...  ✗  got=987000.0  exp=62169.6234  t=6.8s  calls=0
+  [ 31/100] bond_pricing         Calculate the price of a 10-year bond with face va...  ✓  got=1000.0  exp=1000.0000  t=10.1s  calls=0
+  [ 32/100] bond_pricing         Calculate the price of a 10-year bond with face va...  ✓  got=1162.22  exp=1162.2179  t=19.2s  calls=0
+  [ 33/100] bond_pricing         Calculate the price of a 5-year bond with face val...  ✓  got=873.63  exp=873.6291  t=7.2s  calls=0
+  [ 34/100] bond_pricing         Calculate the price of a 10-year zero-coupon bond ...  ✗  got=606.53  exp=613.9133  t=35.3s  calls=0
+  [ 35/100] bond_pricing         Calculate the Macaulay duration of a 10-year bond ...  ✓  got=8.1078  exp=8.1078  t=21.4s  calls=0
+  [ 36/100] bond_pricing         Calculate the Macaulay duration of a 20-year bond ...  ✓  got=11.9472  exp=11.9472  t=14.0s  calls=0
+  [ 37/100] bond_pricing         Calculate the convexity of a 10-year bond with fac...  ✓  got=74.98  exp=74.9977  t=15.3s  calls=0
+  [ 38/100] bond_pricing         Calculate the price of a 3-year bond with face val...  ✓  got=1028.33  exp=1028.2861  t=13.6s  calls=0
+  [ 39/100] bond_pricing         Calculate the price of a 30-year bond with face va...  ✓  got=1137.65  exp=1137.6483  t=12.8s  calls=0
+  [ 40/100] bond_pricing         Calculate the Macaulay duration of a 10-year zero-...  ✓  got=10.0  exp=10.0000  t=3.3s  calls=0
+  [ 41/100] compound_interest    Calculate the future value of $10,000 invested at ...  ✓  got=16288.95  exp=16288.9463  t=10.2s  calls=0
+  [ 42/100] compound_interest    Calculate the future value of $5,000 invested at 6...  ✓  got=6744.25  exp=6744.2508  t=13.3s  calls=0
+  [ 43/100] compound_interest    Calculate the future value of $25,000 invested at ...  ✗  got=45417.4  exp=45417.4175  t=7.8s  calls=0
+  [ 44/100] compound_interest    Calculate the future value of $10,000 invested at ...  ✓  got=22255.41  exp=22255.4093  t=9.7s  calls=0
+  [ 45/100] compound_interest    Calculate the future value of $1,000 invested at 3...  ✓  got=1822.07  exp=1822.0739  t=9.7s  calls=0
+  [ 46/100] compound_interest    Calculate the future value of $50,000 invested at ...  ✓  got=86699.3  exp=86699.3020  t=13.8s  calls=0
+  [ 47/100] compound_interest    Calculate the future value of $100,000 invested at...  ✓  got=448168.91  exp=448168.9070  t=23.8s  calls=0
+  [ 48/100] compound_interest    Calculate the future value of $20,000 invested at ...  ✓  got=22536.5  exp=22536.5006  t=18.6s  calls=0
+  [ 49/100] compound_interest    Calculate the future value of $15,000 invested at ...  ✓  got=66480.68  exp=66480.6847  t=16.3s  calls=0
+  [ 50/100] compound_interest    Calculate the future value of $75,000 invested at ...  ✓  got=78845.33  exp=78845.3322  t=12.1s  calls=0
+  [ 51/100] loan_amortization    Calculate the monthly payment for a $300,000 mortg...  ✓  got=1798.65  exp=1798.6516  t=111.0s  calls=0
+  [ 52/100] loan_amortization    Calculate the monthly payment for a $25,000 car lo...  ✓  got=471.78  exp=471.7808  t=16.3s  calls=0
+  [ 53/100] loan_amortization    Calculate the total interest paid on a $250,000 mo...  ✓  got=206016.78  exp=206016.7788  t=16.1s  calls=0
+  [ 54/100] loan_amortization    Calculate the remaining balance on a $200,000 mort...  ✓  got=183657.46  exp=183657.4642  t=10.7s  calls=0
+  [ 55/100] loan_amortization    Calculate the monthly payment for a $10,000 person...  ✓  got=313.36  exp=313.3637  t=16.2s  calls=0
+  [ 56/100] loan_amortization    Calculate the remaining balance on a $400,000 mort...  ✓  got=315135.84  exp=315135.8368  t=26.8s  calls=0
+  [ 57/100] loan_amortization    Calculate the total interest paid on a $35,000 car...  ✗  got=14700.0  exp=7963.4963  t=8.6s  calls=0
+  [ 58/100] loan_amortization    Calculate the monthly payment for a $350,000 mortg...  ✓  got=2502.09  exp=2502.0889  t=20.3s  calls=0
+  [ 59/100] loan_amortization    Calculate the remaining balance on a $20,000 car l...  ✓  got=8724.07  exp=8724.0683  t=9.6s  calls=0
+  [ 60/100] loan_amortization    Calculate the total interest paid on a $500,000 mo...  ✓  got=235375.11  exp=235375.1092  t=8.1s  calls=0
+  [ 61/100] npv_irr              Calculate the NPV of a project at a 10.0% discount...  ✓  got=16986.54  exp=16986.5446  t=18.6s  calls=0
+  [ 62/100] npv_irr              Calculate the NPV of a project at a 8.0% discount ...  ✓  got=39562.6  exp=39562.6022  t=12.0s  calls=0
+  [ 63/100] npv_irr              Calculate the NPV of a project at a 15.0% discount...  ✓  got=-174076.16  exp=-174076.1641  t=12.1s  calls=0
+  [ 64/100] npv_irr              Calculate the NPV of a project at a 12.0% discount...  ✓  got=50035.84  exp=50035.8447  t=11.9s  calls=0
+  [ 65/100] npv_irr              Calculate the NPV of a project at a 5.0% discount ...  ✓  got=1020.41  exp=1020.4082  t=25.6s  calls=0
+  [ 66/100] npv_irr              Calculate the NPV of a project at a 3.0% discount ...  ✓  got=279530.43  exp=279530.4255  t=20.3s  calls=0
+  [ 67/100] npv_irr              Calculate the NPV of a project at a 10.0% discount...  ✓  got=16973.46  exp=16973.4630  t=7.9s  calls=0
+  [ 68/100] npv_irr              Calculate the NPV of a project at a 7.0% discount ...  ✓  got=-223.6003  exp=-223.6003  t=12.2s  calls=0
+  [ 69/100] npv_irr              Calculate the NPV of a project at a 9.0% discount ...  ✓  got=70234.8  exp=70234.8001  t=11.0s  calls=0
+  [ 70/100] npv_irr              Calculate the NPV of a project at a 20.0% discount...  ✓  got=-2337.963  exp=-2337.9630  t=34.1s  calls=0
+  [ 71/100] portfolio_metrics    Calculate the weighted portfolio return for two as...  ✗  got=10.4  exp=0.1040  t=7.8s  calls=0
+  [ 72/100] portfolio_metrics    Calculate the weighted portfolio return for three ...  ✓  got=0.101  exp=0.1010  t=18.2s  calls=0
+  [ 73/100] portfolio_metrics    Calculate the portfolio variance for two assets wi...  ✓  got=0.036  exp=0.0360  t=20.0s  calls=0
+  [ 74/100] portfolio_metrics    Calculate the portfolio standard deviation for two...  ✗  got=0.156  exp=0.1696  t=9.1s  calls=0
+  [ 75/100] portfolio_metrics    Calculate the Sharpe ratio for a portfolio with re...  ✓  got=0.6111  exp=0.6111  t=16.5s  calls=0
+  [ 76/100] portfolio_metrics    Calculate the Sharpe ratio for a portfolio with re...  ✓  got=0.5833  exp=0.5833  t=8.5s  calls=0
+  [ 77/100] portfolio_metrics    Calculate the portfolio variance for three assets ...  ✓  got=0.0269  exp=0.0269  t=25.6s  calls=0
+  [ 78/100] portfolio_metrics    Calculate the information ratio for a portfolio wi...  ✓  got=0.4  exp=0.4000  t=4.6s  calls=0
+  [ 79/100] portfolio_metrics    Calculate the Sortino ratio for a portfolio with r...  ✓  got=1.2  exp=1.2000  t=4.8s  calls=0
+  [ 80/100] portfolio_metrics    Calculate the weighted portfolio return for four e...  ✗  got=None  exp=0.0900  t=4.3s  calls=0
+  [ 81/100] derivatives_misc     Using put-call parity, find the call price given: ...  ✗  got=5.57  exp=10.4471  t=5.5s  calls=0
+  [ 82/100] derivatives_misc     Using put-call parity, find the put price given: S...  ✓  got=5.22  exp=5.2209  t=7.4s  calls=0
+  [ 83/100] derivatives_misc     Calculate the forward price of an asset with spot ...  ✓  got=53.0918  exp=53.0918  t=9.6s  calls=0
+  [ 84/100] derivatives_misc     Calculate the forward price of an asset with spot ...  ✓  got=101.5113  exp=101.5113  t=11.2s  calls=0
+  [ 85/100] derivatives_misc     Calculate the forward price of an asset with spot ...  ✓  got=212.37  exp=212.3673  t=6.6s  calls=0
+  [ 86/100] derivatives_misc     Calculate the profit of a covered call strategy wh...  ✗  got=None  exp=5.0000  t=5.2s  calls=0
+  [ 87/100] derivatives_misc     Calculate the profit of a covered call strategy wh...  ✗  got=None  exp=0.0000  t=4.3s  calls=0
+  [ 88/100] derivatives_misc     Calculate the profit of a protective put strategy ...  ✗  got=None  exp=-9.0000  t=7.0s  calls=0
+  [ 89/100] derivatives_misc     Calculate the profit of a protective put strategy ...  ✓  got=16.0  exp=16.0000  t=5.2s  calls=0
+  [ 90/100] derivatives_misc     Calculate the forward price of an asset with spot ...  ✓  got=156.9042  exp=156.9042  t=10.3s  calls=0
+  [ 91/100] depreciation_tax     Calculate the annual straight-line depreciation fo...  ✓  got=9000.0  exp=9000.0000  t=4.9s  calls=0
+  [ 92/100] depreciation_tax     Calculate the annual straight-line depreciation fo...  ✓  got=9000.0  exp=9000.0000  t=4.7s  calls=0
+  [ 93/100] depreciation_tax     Calculate the declining balance depreciation for y...  ✓  got=16000.0  exp=16000.0000  t=2.9s  calls=0
+  [ 94/100] depreciation_tax     Calculate the declining balance depreciation for y...  ✓  got=10240.0  exp=10240.0000  t=6.7s  calls=0
+  [ 95/100] depreciation_tax     Calculate the after-tax cash flow given revenue of...  ✓  got=144500.0  exp=144500.0000  t=10.1s  calls=0
+  [ 96/100] depreciation_tax     Calculate the after-tax cash flow given revenue of...  ✓  got=339000.0  exp=339000.0000  t=33.5s  calls=0
+  [ 97/100] depreciation_tax     Calculate the tax shield from an interest expense ...  ✓  got=15000.0  exp=15000.0000  t=3.8s  calls=0
+  [ 98/100] depreciation_tax     Calculate the tax shield from an interest expense ...  ✓  got=30000.0  exp=30000.0000  t=5.0s  calls=0
+  [ 99/100] depreciation_tax     Calculate the effective tax rate if a company paid...  ✗  got=25.0  exp=0.2500  t=3.4s  calls=0
+  [100/100] depreciation_tax     Calculate the book value after 5 years for an asse...  ✓  got=28476.56  exp=28476.5625  t=12.1s  calls=0
+
+  [1mAccuracy: 75.0%[0m
+
+[1m================================================================
+  COMPARISON SUMMARY
+================================================================[0m
+
++----------------------+----------------------+----------------------+----------------------+
+|        Metric        |     pydantic_ai      |      dspy_react      |    dspy_optimized    |
++======================+======================+======================+======================+
+|       Accuracy       |        60.0%         |        81.0%         |        75.0%         |
+|   Correct / Total    |        60/100        |        81/100        |        75/100        |
+|  Exec Success Rate   |        61.0%         |        95.0%         |         0.0%         |
+|   Mean Latency (s)   |        12.22         |        22.82         |        17.14         |
+|  Median Latency (s)  |         5.42         |        17.03         |        13.55         |
+|   P95 Latency (s)    |        39.75         |        56.58         |        42.74         |
+|  Mean Sandbox Calls  |         1.12         |         1.52         |         0.00         |
+|     Total Errors     |          29          |          0           |          0           |
++----------------------+----------------------+----------------------+----------------------+
+
+[1mPer-category accuracy:[0m
+  Category             | pydantic_ai          | dspy_react           | dspy_optimized      
+  ----------------------------------------------------------------------------------------
+  bond_pricing         | 50%                  | 90%                  | 90%                 
+  compound_interest    | 100%                 | 90%                  | 90%                 
+  depreciation_tax     | 100%                 | 80%                  | 90%                 
+  derivatives_misc     | 80%                  | 100%                 | 60%                 
+  greeks               | 20%                  | 70%                  | 80%                 
+  loan_amortization    | 70%                  | 90%                  | 90%                 
+  npv_irr              | 60%                  | 100%                 | 100%                
+  option_pricing       | 60%                  | 100%                 | 80%                 
+  portfolio_metrics    | 60%                  | 90%                  | 70%                 
+  var_portfolio        | 0%                   | 0%                   | 0%                  
+
+[2mResults saved to: benchmark/results/benchmark_20260211_120644.json[0m

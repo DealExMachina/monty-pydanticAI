@@ -1,0 +1,56 @@
+{
+  "timestamp": "20260211_110821",
+  "model": "nemotron",
+  "summaries": {
+    "pydantic_ai": {
+      "accuracy": 1.0,
+      "correct_count": 2,
+      "total_questions": 2,
+      "execution_success_rate": 1.0,
+      "mean_wall_time_s": 30.321518021461088,
+      "median_wall_time_s": 56.048970708972774,
+      "p95_wall_time_s": 56.048970708972774,
+      "mean_sandbox_calls": 2.0,
+      "mean_prompt_tokens": 11560.0,
+      "mean_completion_tokens": 4347.5,
+      "total_tokens": 31815,
+      "estimated_cost_usd": 0.0031815000000000003,
+      "total_errors": 0,
+      "category_accuracy": {
+        "option_pricing": 1.0
+      }
+    }
+  },
+  "per_question": {
+    "pydantic_ai": [
+      {
+        "question": "Calculate the Black-Scholes price of a European call option with S=100, K=100, T=1.0, r=0.05, sigma=0.2.",
+        "category": "option_pricing",
+        "correct": true,
+        "execution_success": true,
+        "extracted_number": 11.9051,
+        "expected_answer": 11.905133596815745,
+        "absolute_error": 3.359681574544027e-05,
+        "wall_time_s": 4.594065333949402,
+        "sandbox_calls": 1,
+        "prompt_tokens": 1905,
+        "completion_tokens": 453,
+        "error": null
+      },
+      {
+        "question": "Calculate the Black-Scholes price of a European put option with S=100, K=90, T=0.5, r=0.03, sigma=0.25.",
+        "category": "option_pricing",
+        "correct": true,
+        "execution_success": true,
+        "extracted_number": 2.65,
+        "expected_answer": 2.649973152472594,
+        "absolute_error": 2.684752740611529e-05,
+        "wall_time_s": 56.048970708972774,
+        "sandbox_calls": 3,
+        "prompt_tokens": 21215,
+        "completion_tokens": 8242,
+        "error": null
+      }
+    ]
+  }
+}

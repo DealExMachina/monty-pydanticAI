@@ -1,7 +1,8 @@
 """DSPy ReAct agent runner for the benchmark.
 
-Uses dspy.ReAct with a run_python tool that calls the shared Monty sandbox.
-Configures DSPy to use qwen3:8b via Ollama.
+Uses dspy.ReAct with a stateful_python_code_exec tool that calls the shared
+Monty sandbox. The tool is named to match Nemotron's trained tool name.
+Configures DSPy to use Nemotron via vLLM on Koyeb.
 """
 
 from __future__ import annotations
@@ -14,15 +15,21 @@ from benchmark.metrics import AgentResult
 from benchmark.sandbox import SandboxSession
 from benchmark.agent_pydantic import extract_number
 
+# ── Model configuration ────────────────────────────────────────────
+
+VLLM_BASE_URL = "https://nemotron-3-inference-dealexmachina-53d19e1c.koyeb.app/v1"
+VLLM_MODEL = "nemotron"
+VLLM_API_KEY = "dummy"  # vLLM doesn't require auth but the client needs a value
+
 # ── DSPy LM configuration ──────────────────────────────────────────
 
 
 def configure_dspy_lm() -> dspy.LM:
-    """Configure DSPy to use qwen3:8b via Ollama."""
+    """Configure DSPy to use Nemotron via vLLM on Koyeb."""
     lm = dspy.LM(
-        "ollama_chat/qwen3:8b",
-        api_base="http://localhost:11434",
-        api_key="",
+        f"openai/{VLLM_MODEL}",
+        api_base=VLLM_BASE_URL,
+        api_key=VLLM_API_KEY,
         temperature=0.3,
         cache=False,
     )
@@ -33,17 +40,23 @@ def configure_dspy_lm() -> dspy.LM:
 
 
 def make_tool_function(session: SandboxSession):
-    """Create a run_python tool function bound to a SandboxSession.
+    """Create a stateful_python_code_exec tool function bound to a SandboxSession.
 
-    The returned function has proper type hints and docstring for DSPy
-    to infer the tool schema.
+    The tool is named to match Nemotron's trained tool name. The returned
+    function has proper type hints and docstring for DSPy to infer the tool schema.
     """
 
-    def run_python(code: str) -> str:
-        """Execute Python code in a secure Monty sandbox for financial calculations.
+    def stateful_python_code_exec(code: str) -> str:
+        """Execute Python code in a sandboxed environment for financial calculations.
 
-        The sandbox provides math functions you can call directly (no import):
-        sqrt(x), ln(x), exp(x), norm_cdf(x), norm_pdf(x), abs(x), max_val(a,b).
+        External math functions (call directly, no import):
+        sqrt(x), ln(x), exp(x), norm_cdf(x), norm_pdf(x).
+
+        Native builtins also available:
+        min, max, abs, round, sum, len, range, pow, sorted, enumerate.
+
+        Supports for/while loops, if/else, function definitions (def),
+        and list comprehensions.
 
         Code formatting rules:
         - All top-level statements must start at column 0.
@@ -62,7 +75,7 @@ def make_tool_function(session: SandboxSession):
         """
         return session.execute(code)
 
-    return run_python
+    return stateful_python_code_exec
 
 
 # ── Runner ──────────────────────────────────────────────────────────
@@ -91,6 +104,15 @@ def run_dspy_agent(
         # For optimized agent: we rebuild with fresh tool but same demos
         react_agent = react
 
+    # Capture history length before call to get delta (LM is shared)
+    history_len_before = 0
+    try:
+        lm = dspy.settings.lm
+        if lm:
+            history_len_before = len(lm.history)
+    except Exception:
+        pass
+
     t0 = time.perf_counter()
     try:
         result = react_agent(question=question)
@@ -109,6 +131,23 @@ def run_dspy_agent(
         if extracted is None:
             extracted = extract_number(raw_answer)
 
+        # Token usage from LM history (only new entries for this call)
+        prompt_tokens, completion_tokens = 0, 0
+        try:
+            lm = dspy.settings.lm
+            if lm and lm.history:
+                for entry in lm.history[history_len_before:]:
+                    usage = entry.get("usage") if isinstance(entry, dict) else None
+                    if usage:
+                        prompt_tokens += usage.get("prompt_tokens", 0) or usage.get(
+                            "input_tokens", 0
+                        )
+                        completion_tokens += usage.get(
+                            "completion_tokens", 0
+                        ) or usage.get("output_tokens", 0)
+        except Exception:
+            pass
+
         return AgentResult(
             agent_name=agent_name,
             question=question,
@@ -117,6 +156,8 @@ def run_dspy_agent(
             sandbox_calls=session.call_count,
             sandbox_success=any(r.success for r in session.results),
             wall_time_s=wall_time,
+            prompt_tokens=prompt_tokens,
+            completion_tokens=completion_tokens,
         )
     except Exception as exc:
         wall_time = time.perf_counter() - t0
@@ -129,4 +170,6 @@ def run_dspy_agent(
             sandbox_success=False,
             wall_time_s=wall_time,
             error=str(exc),
+            prompt_tokens=0,
+            completion_tokens=0,
         )

@@ -13,6 +13,7 @@ import time
 from dataclasses import dataclass, field
 
 import pydantic_monty
+from pydantic_monty import ResourceLimits
 
 # ── External functions (host-side implementations) ──────────────────
 
@@ -54,25 +55,21 @@ def _norm_cdf(x: float) -> float:
     return 0.5 * (1.0 + sign * y)
 
 
-def _abs(x: float) -> float:
-    return abs(x)
-
-
-def _max_fn(*args: float) -> float:
-    return max(args)
-
-
 EXTERNAL_FUNCTIONS = {
     "sqrt": _sqrt,
     "ln": _ln,
     "exp": _exp,
     "norm_cdf": _norm_cdf,
     "norm_pdf": _norm_pdf,
-    "abs": _abs,
-    "max_val": _max_fn,
 }
 
 EXTERNAL_FUNCTION_NAMES = list(EXTERNAL_FUNCTIONS.keys())
+
+# Safety limits for sandbox execution
+RESOURCE_LIMITS: ResourceLimits = {
+    "max_duration_secs": 10.0,  # 10s hard cap per execution
+    "max_memory": 50 * 1024 * 1024,  # 50 MB heap
+}
 
 
 # ── Sandbox types ───────────────────────────────────────────────────
@@ -126,25 +123,13 @@ class SandboxSession:
                 external_functions=EXTERNAL_FUNCTION_NAMES,
             )
 
-            # Execute with start/resume loop for external function calls
-            result = m.start()
-            while isinstance(result, pydantic_monty.MontySnapshot):
-                fn_name = result.function_name
-                fn_args = result.args
-
-                if fn_name in EXTERNAL_FUNCTIONS:
-                    fn = EXTERNAL_FUNCTIONS[fn_name]
-                    try:
-                        ret = fn(*fn_args)
-                    except Exception as fn_exc:
-                        ret = float("nan")
-                else:
-                    ret = None
-
-                result = result.resume(return_value=ret)
-
-            # result is now MontyComplete
-            output = result.output
+            # Monty.run() handles the start/resume loop internally,
+            # including proper forwarding of args and kwargs to external
+            # functions. Resource limits prevent runaway execution.
+            output = m.run(
+                external_functions=EXTERNAL_FUNCTIONS,
+                limits=RESOURCE_LIMITS,
+            )
             elapsed_us = (time.perf_counter() - t0) * 1_000_000
 
             result_str = repr(output) if output is not None else "(no return value)"
